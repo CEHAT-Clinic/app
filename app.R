@@ -13,6 +13,7 @@ library(tidyverse)
 library(zoo)
 library(gridExtra)
 library(PurpleAirCEHAT)
+library(markdown)
 library(lubridate)
 library(shinythemes)
 library(testthat)
@@ -71,7 +72,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          p("To create a static (uneditable) report select the word document option. Otherwise, leave the format set to pdf."),
                                          p("The report can only be uploaded with datasets that have been generated, so make sure to go to each page to ensure every plot is loaded."),
                                          br(),
-                                         radioButtons('format', 'Document format', c('PDF', 'Word')),
+                                         radioButtons('format', strong('Document format'), c('PDF', 'Word')),
                                          downloadButton("report", "Generate report")
 
 
@@ -173,11 +174,12 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
 
                                 tabPanel("Sensor Summaries",
+                                         
 
                                          sidebarPanel(
 
                                              uiOutput("sensorSel_HL"),
-                                             uiOutput("sensor"),
+                                             
                                              p("Histogram of Highs Slider"),
                                              selectInput("n_breaks", label = "Number of bins:",
                                                          choices = c(4, 8, 16, 24), selected = 8)
@@ -187,15 +189,17 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
 
                                              h2("Maintaining the Sensor Network"),
-                                             p("On this page, you can find several plots that showcase different aspects of sensors functionality,
-                                               including how often they go down, which EPA categories they tend to report, and which sensors typically report higher, or lower, values"),
+                                             p("On this page, you can find several plots that showcase different 
+                                                aspects of sensors functionality, including how often they go down, 
+                                               which EPA categories they tend to report, and which sensors typically 
+                                               report higher, or lower, values."),
 
 
                                              br(),
 
                                              h3("Network-based Observations"),
                                              p("This section shows plots that include all of the sensors. These plots allow
-                                               for a holsitic inspection of the sensor network, showing where sensors report
+                                               for a holistic inspection of the sensor network, showing where sensors report
                                                higher values, where sensors report lower values, which sensors typically
                                                report outliers, and finally, how often each of the sensors go down."),
                                              br(),
@@ -210,9 +214,9 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              br(),
 
                                              p("The chart below reports the number of days during which a sensor did not report any
-                                               PM2.5 readings. Keep in mind that, for any sensors that are activated, or decativated,
+                                               PM2.5 readings. Keep in mind that, for any sensors that are activated, or deactivated,
                                                during the timeframe observed in the data, this chart will report that as being 'down',
-                                               so external inforamtion about the sensor network is required to take these results at face-value."),
+                                               so external information about the sensor network is required to take these results at face-value."),
                                              plotlyOutput("downDays"),
                                              br(),
                                              br(),
@@ -254,6 +258,8 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                difference data (for data downloaded after March, 30, 2021)."),
 
                                              plotOutput("catsBySensor"),
+                                             br(),
+                                             verbatimTextOutput("catPercentages"),
                                              br(),
                                              br(),
                                              plotOutput("percentDiff"),
@@ -863,6 +869,80 @@ server <- function(input, output) {
         )
 
     })
+    
+    
+    output$catPercentages <- renderText({
+        req(input$file1)
+        
+        PAhourly <- PAhourly()
+        
+        x <- PAhourly[PAhourly$names == input$sensor,] %>% dplyr::count(category)
+        
+        if(length(x[x$category == "Good",2])==0){
+            g <- "0%"
+        }
+        else if(x[x$category == "Good",2]/sum(x[,2])<0.01){
+            g <- "less than 0.01%"
+        }
+        else{g<-paste(round(x[x$category == "Good",2]/sum(x[,2]), 2),"%")}
+        
+        
+        if(length(x[x$category == "Moderate",2])==0){
+            m <- "0%"
+        }
+        else if(x[x$category == "Moderate",2]/sum(x[,2])<0.01){
+            m <- "less than 0.01%"
+        }
+        else{m<-paste(round(x[x$category == "Moderate",2]/sum(x[,2]), 2),"%")}
+        
+    
+        if(length(x[x$category == "Unhealthy for Sensitive Groups",2])==0){
+            ufsg <- "0%"
+        }
+        else if(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])<0.01){
+            ufsg <- "less than 0.01%"
+        }
+        else{ufsg<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2]), 2),"%")}
+    
+        
+        if(length(x[x$category == "Unhealthy",2])==0){
+            u <- "0%"
+        }
+        else if(x[x$category == "Unhealthy",2]/sum(x[,2])<0.01){
+            u <- "less than 0.01%"
+        }
+        else{u<-paste(round(x[x$category == "Unhealthy",2]/sum(x[,2]), 2),"%")}
+        
+        
+        if(length(x[x$category == "Very Unhealthy",2])==0){
+            vu <- "0%"
+        }
+        else if(x[x$category == "Very Unhealthy",2]/sum(x[,2])<0.01){
+            vu <- "less than 0.01%"
+        }
+        else{vu<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2]), 2),"%")}
+        
+        
+        if(length(x[x$category == "Hazardous",2])==0){
+            h <- "0%"
+        }
+        else if(x[x$category == "Hazardous",2]/sum(x[,2])<0.01){
+            h <- "less than 0.01%"
+        }
+        else{h<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2]), 2),"%")}
+        
+        
+        
+        output <- paste(    paste("Good:", g, sep=" "),
+                            paste("Moderate:", m, sep=" "),
+                            paste("Unhealthy for Sensitive Groups:", ufsg, sep=" "),
+                            paste("Unhealthy:", u, sep=" "),
+                            paste("Very Unhealthy:", vu, sep=" "),
+                            paste("Hazardous:", h, sep=" "),
+                            sep="\n")
+        output
+        
+    })
 
     output$catsSensors <- renderPlotly({
         req(input$file1)
@@ -1249,18 +1329,12 @@ server <- function(input, output) {
         sensorsList()
     }))
 
-    output$contents <- renderTable({
-        # input$file1 will be NULL initially. After the user selects
-        # and uploads a file, head of that data file by default,
-        # or all rows if selected, will be shown.
-
+    output$contents <- DT::renderDataTable(DT::datatable({
         req(input$file1)
-
-        #messyPA <- read.csv(input$main$datapath)
-        PAhourly <- PAhourly()
-
-        return(head(PAhourly))
-    })
+        
+        PAhourly()
+    }))
+        
 
     output$ttests <- renderText({
         req(input$file1)
@@ -1312,7 +1386,7 @@ server <- function(input, output) {
         PAfull <- newPAfull()
         if(input$answer == "Y"){
             title <- paste("Historical Percent Difference for", input$sensor, sep=" ")
-            plot(x=PAfull$timestamp[PAfull$names==input$sensor], y=PAfull$percent.diff[PAfull$names==input$sensor], xlab = "Time", ylab = "Percent Difference", main = title, type="l")
+            plot(x=PAfull$timestamp[PAfull$names==input$sensor], y=PAfull$percent.diff[PAfull$names==input$sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")
         }
         else{return(NULL)}
     })
@@ -1641,27 +1715,33 @@ server <- function(input, output) {
 
     output$report <- downloadHandler(
         filename = function() {
-            paste('report', sep = '.', switch(
+            paste('Report', sep = '.', switch(
                 input$format, PDF = 'pdf', Word = 'docx'))
         },
 
         content = function(file) {
-            src <- normalizePath('report.Rmd')
+            src <- normalizePath('Report.Rmd')
 
             # temporarily switch to the temp dir, in case you do not have write
             # permission to the current working directory
             owd <- setwd(tempdir())
             on.exit(setwd(owd))
-            file.copy(src, 'report.Rmd', overwrite = TRUE)
+            file.copy(src, 'Report.Rmd', overwrite = TRUE)
 
-            params <- list(d1 = input$date1,
+            params <- list(overEPA = overThresholdSG(),
+                           d1 = input$date1,
                            d2 = input$date2,
                            d3 = input$date3,
                            dts1 = input$dates1,
                            dts2 = input$dates2,
                            dts3 = input$dates3,
                            dts4 = input$dates4,
+                           daily = dailySG(),
+                           down = downSensors(),
                            hour = input$hour,
+                           highlow = PAhi_lo(),
+                           matching = matchingDays(),
+                           over = readingsOver(),
                            PAhourly = PAhourly(),
                            sensor = input$sensor,
                            sensors = input$sensorSel,
@@ -1669,7 +1749,7 @@ server <- function(input, output) {
                            under = readingsUnder() )
 
             library(rmarkdown)
-            out <- render('report.Rmd', params = params, switch(
+            out <- render('Report.Rmd', params = params, switch(
                 input$format, PDF = pdf_document(), Word = word_document() ), envir = new.env(parent = globalenv()))
             file.rename(out, file)
         }
