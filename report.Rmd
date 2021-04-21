@@ -3,6 +3,7 @@ title: "South Gate PurpleAir Data Report"
 author: "~~~~~"
 output: pdf_document
 params:
+  overEPA: NA
   d1: NA
   d2: NA
   d3: NA
@@ -10,13 +11,19 @@ params:
   dts2: NA
   dts3: NA
   dts4: NA
+  daily: NA
+  down: NA
   hour: NA
+  highlow: NA
+  matching: NA
+  over: NA
   PAhourly: NA
   sensor: NA
   sensors: NA
   summary: NA
   under: NA
 ---
+
 
 ```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -32,15 +39,34 @@ library(lubridate)
 
 ```
 
-This analysis uses
+## Overview (data cleaning, method of interpolation,  any notes, etc.)
 
 
 
-
+## Summary Statistics 
 
 ```{r}
 print(params$PAhourly)
 ```
+
+```{r}
+# PAhi_lo <- params$highlow
+# 
+# dates <- params$dts3
+# 
+#       dens <- ggplot(PAhi_lo[PAhi_lo$type == "high" & lubridate::date(PAhi_lo$timestamp) >= toString(dates[1]) & lubridate::date(PAhi_lo$timestamp) <= toString(dates[2]),], aes(x=hour, group = timeofday))+
+#           geom_histogram(aes(y=after_stat(count/nrow(PAhi_lo[PAhi_lo$type == "high",])), color=timeofday, fill=timeofday), alpha=0.7, stat="count", bins=4, lwd=1)+
+#           geom_density(alpha = 0.2, fill = "grey")+
+#           labs(x = "Hour", y = "Density") +
+#           ggtitle("Density of Peak PM2.5 Values Over 24-hour Period")+
+#           scale_color_brewer(palette="Set1")+
+#           scale_fill_brewer(palette="Set1")+
+#           theme_minimal()
+# 
+# print(dens)
+```
+
+
 
 
 ```{r}
@@ -49,9 +75,11 @@ print(params$sensor)
 
 
 
+## Sensor Summaries
 
 
-```{r plot, echo=FALSE}
+
+```{r overMedian, echo=FALSE}
 
 readings_underCT <- params$under
 
@@ -73,4 +101,45 @@ plot <- ggplot(readings_underCT, aes(x=names)) +
 print(plot)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+## AB617 Comparisons
+
+
+
+
+
+
+
+## Interpolation and Sensor Placement
+
+
+
+
+```{r}
+# PAhourly <- params$PAhourly %>% dplyr::filter(params$PAhourly$timestamp == as_datetime(params$d1)+ lubridate::hours(params$hour))
+#         
+# sensitiveLocations <- PurpleAirCEHAT::sensitiveLocations(PAhourly,as_datetime(params$d1)+ lubridate::hours(params$hour))
+# seniorCenters <- filter(sensitiveLocations, endsWith(places,"SC"))
+# 
+# sg.city <- PurpleAirCEHAT::southgate()
+# 
+# 
+# k <- ggplot(seniorCenters, aes(longitude, latitude)) +
+#     geom_path(data = sg.city, aes(long, lat, group=id), color='black')+
+#     geom_point(aes(size= .9,fill= PM25)) +
+#     xlim(-118.2325,-118.155) +
+#     ylim(33.91029, 33.96837)+
+#     guides(size=FALSE) +
+#     ggtitle("Using Kriging to Predict PM2.5 near Senior Centers")+
+#     geom_text(aes(label=places), check_overlap = F, show.legend = F, size = 3, vjust = 2)+
+#     theme_minimal()
+# 
+# 
+# print(k)
+```
+
+
+
+
