@@ -265,7 +265,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              plotOutput( outputId = "hiloHist"),
                                              br(),
                                              br(),
-                                             plotlyOutput(outputId = "overThresholdSensor"),
+                                             #plotlyOutput(outputId = "overThresholdSensor"),
                                              br(),
                                              br(),
 
@@ -1513,13 +1513,13 @@ server <- function(input, output) {
         sg.city <- PurpleAirCEHAT::southgate()
         
         
-        k <- ggplot(schools, aes(longitude, latitude,fill= PM25)) +
+        k <- ggplot(schools, aes(longitude, latitude)) +
             geom_path(data = sg.city, aes(long, lat, group=id), color='black')+
-            geom_point(aes(size= .9,fill=PM25)) +
+            geom_point(aes(size = .9, fill=AQI,group=places)) +
             xlim(-118.2325,-118.155) +
             ylim(33.91029, 33.96837)+
             guides(size=FALSE) +
-            ggtitle("Using Kriging to Predict PM2.5 near Schools")+
+            ggtitle("Using Kriging to Predict AQI near Schools")+
             geom_text(aes(label=places), check_overlap = F, show.legend = F, size = 3, vjust = 2)+
             theme_minimal()
         
@@ -1541,11 +1541,11 @@ server <- function(input, output) {
         
         k <- ggplot(centers, aes(longitude, latitude)) +
             geom_path(data = sg.city, aes(long, lat, group=id), color='black')+
-            geom_point(aes(size= .9,fill= PM25)) +
+            geom_point(aes(size= .9,fill= AQI,group=places)) +
             xlim(-118.2325,-118.155) +
             ylim(33.91029, 33.96837)+
             guides(size=FALSE) +
-            ggtitle("Using Kriging to Predict PM2.5 near Parks and Shopping Centers")+
+            ggtitle("Using Kriging to Predict AQI near Parks and Shopping Centers")+
             geom_text(aes(label=places), check_overlap = F, show.legend = F, size = 3, vjust = 2)+
             theme_minimal()
         
@@ -1567,11 +1567,11 @@ server <- function(input, output) {
         
         k <- ggplot(medicalCenters, aes(longitude, latitude)) +
             geom_path(data = sg.city, aes(long, lat, group=id), color='black')+
-            geom_point(aes(size= .9,fill= PM25)) +
+            geom_point(aes(size= .9,fill= AQI,group=places)) +
             xlim(-118.2325,-118.155) +
             ylim(33.91029, 33.96837)+
             guides(size=FALSE) +
-            ggtitle("Using Kriging to Predict PM2.5 near Medical Centers")+
+            ggtitle("Using Kriging to Predict AQI near Medical Centers")+
             geom_text(aes(label=places), check_overlap = F, show.legend = F, size = 3, vjust = 2)+
             theme_minimal()
         
@@ -1593,11 +1593,11 @@ server <- function(input, output) {
         
         k <- ggplot(seniorCenters, aes(longitude, latitude)) +
             geom_path(data = sg.city, aes(long, lat, group=id), color='black')+
-            geom_point(aes(size= .9,fill= PM25)) +
+            geom_point(aes(size= .9,fill= AQI,group=places)) +
             xlim(-118.2325,-118.155) +
             ylim(33.91029, 33.96837)+
             guides(size=FALSE) +
-            ggtitle("Using Kriging to Predict PM2.5 near Senior Centers")+
+            ggtitle("Using Kriging to Predict AQI near Senior Centers")+
             geom_text(aes(label=places), check_overlap = F, show.legend = F, size = 3, vjust = 2)+
             theme_minimal()
         
