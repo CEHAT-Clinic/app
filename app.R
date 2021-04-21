@@ -265,10 +265,9 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              plotOutput( outputId = "hiloHist"),
                                              br(),
                                              br(),
-                                             #plotlyOutput(outputId = "overThresholdSensor"),
+                                             
                                              br(),
                                              br(),
-
 
                                              br(),
                                              br(),
