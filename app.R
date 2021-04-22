@@ -286,12 +286,15 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                 tabPanel("Comparisons",
 
 
-                                         h2("South Gate PM2.5 vs. other areas in LA "),
+                                         h2("South Gate PM2.5 vs. other areas in Southern California "),
                                          br(),
                                          h2("The Data"),
                                          p("We are specifically comparing the South Gate data against AQMD data. To find datasets that you can use, visit the",
                                            a("AB 617 Community Air Monitoring website.",
-                                             href = "http://xappprod.aqmd.gov/AB617CommunityAirMonitoring/")),
+                                             href = "http://xappprod.aqmd.gov/AB617CommunityAirMonitoring/"), "Also, keep in mind that in order for this page to 
+                                           populate with plots, the days in the AQMD data and in the PurpleAir data must overlap. So,for example, you can not upload PurpleAir data
+                                           from December and AQMD from April. "),
+                                         
 
                                          #strong("Upload your", em("AQMD csv file"), "here:"),
 
@@ -305,10 +308,23 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          h2("Visuals"),
                                          p("After conducting t tests on these data sets, we have found that:"),
                                          strong(textOutput("ttests")),
-                                         p("We have also provided a box plot and a bar chart. Through these visuals, we hope that you can get a sense where South Gate's PM2.5 levels stand compared to levels in other parts of LA."),
+                                         p("We have also provided a box plot and a bar chart. Through these visuals, 
+                                           we hope that you can get a sense where South Gate's PM2.5 levels stand 
+                                           compared to levels in other parts of LA."),
                                          br(),
+                                         p("The following charts are are box plots that 
+                                           compare the Indio PM2.5 values (left) and the South Gate 
+                                           PM2.5 values (right). The box-and-whisker graphics in the plot 
+                                           are separated into five sections. From bottom to top, they are the minimum, 
+                                           lower quartile, median, the upper quartile, the maximum. You can see specific 
+                                           values for the air quality for both cities by hovering over the plots. "),
                                          plotlyOutput(outputId = "compareBoxplot"),
                                          br(),
+                                         p("The following chart is a side-by-side bar chart that shows the daily averages for PM2.5 
+                                           values in both Indio and South Gate with a legend specifying the corresponding colors. 
+                                           If you hover over the bars, you will see the day as 
+                                           well as the daily PM2.5 average."),
+                                         
                                          plotlyOutput(outputId = "compareBar")
 
                                 ),
@@ -327,6 +343,15 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              plotlyOutput("variance"),
 
                                              plotlyOutput("stdev"),
+                                             
+                                             p("We consider a place in South Gate to be a sensitive location if it is 
+                                             populated by people that are at greater risk for health problems, 
+                                             such as children, older adults, and those with pre-existing health conditions. 
+                                             The following charts predict the AQI values at sensitive locations (including
+                                               8 schools, 5 medical centers, 2 parks, 2 shopping centers, and 3 senior centers) in 
+                                               South Gate at a specific date and time using ordinary kriging. If you hover over
+                                               a location, you will see the name of that location as well as is location (in longitude 
+                                               and latitude) and the predicted AQI value."),
                                              
                                              plotlyOutput("schools"),
                                              
@@ -635,7 +660,6 @@ server <- function(input, output, session) {
         req(input$file1)
 
         summarySG <- summarySG()
-        names(summarySG)[2] <- "PM2.5"
         overEPA <- PurpleAirCEHAT::overEPA(summarySG)
 
         return(overEPA)
@@ -1253,6 +1277,8 @@ server <- function(input, output, session) {
         x <- paste(percentiles[6], "μg/m3", sep = " ")
         x
     })
+    
+
 
     output$secondMax <- renderText({
         req(input$file1)
@@ -1422,9 +1448,10 @@ server <- function(input, output, session) {
 
         # finding the days over EPA threshold
         overEPA <- overEPAthresholdSG()
-        ourData <- PurpleAirCEHAT::overEPA_hist(overEPA,numDays)
+        
 
         if(length(overEPA$timestamp) > 0) {
+            ourData <- PurpleAirCEHAT::overEPA_hist(overEPA,numDays)
             epahist <- ggplot(ourData, aes(x=day,y=freq)) +
                 geom_bar(position="dodge", stat="identity") +
                 ggtitle("Days over EPA threshold in South Gate")}
