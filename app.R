@@ -68,12 +68,13 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
 
                                          br(),
-                                         p("After creating the desired plots, download this report as a pdf or a word document by clicking the", strong("button"), "below."),
+                                         p("After creating the desired plots, download this report as a pdf or a word document by clicking the", strong(em("Generate Report")), "button below."),
                                          p("To create a static (uneditable) report select the word document option. Otherwise, leave the format set to pdf."),
                                          p("The report can only be uploaded with datasets that have been generated, so make sure to go to each page to ensure every plot is loaded."),
                                          br(),
                                          radioButtons('format', strong('Document format'), c('PDF', 'Word')),
-                                         downloadButton("report", "Generate report")
+                                        # downloadButton("report", "Create report"),
+                                         downloadButton('downloadReport')
 
 
                                 ),
@@ -135,7 +136,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              p("Percentage of PM2.5 readings in the 'Hazardous' category", verbatimTextOutput("percentagesH")),
 
                                              #Output: Data file ----
-                                             tableOutput("contents"),
+                                             DT::dataTableOutput("contents"),
                                              downloadButton(outputId = "downloadPAhourly", "Download Hourly Sensor Data"),
 
                                              #Plotly plots
@@ -159,9 +160,8 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              plotOutput("diurnalAVG"),
                                              plotOutput("diurnalMax"),
                                              plotOutput("diurnalRange"),
-
-                                             downloadButton(outputId = "downloadavgSG", "Download General South Gate Air Quality Data"),
-
+                                             
+                                             downloadButton("downloadavgSG", "Download General South Gate Air Quality Data"),
                                              br(),
                                              br(),
                                              br(),
@@ -355,11 +355,12 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
 
 # Define server function
-server <- function(input, output) {
+server <- function(input, output, session) {
 
     ##############################################
     # RENDERING UI FOR DATA-DEPENDENT INPUTS
     ##############################################
+    
 
     output$sensorSel <- renderUI({
         req(input$file1)
@@ -485,7 +486,7 @@ server <- function(input, output) {
         req(input$file1)
 
         sliderInput("hour", label = strong("Choose hour"), min = 0,
-                    max = 24, value = 0 )
+                    max = 24, value = lubridate::hour(PAhourly()$timestamp[1]) )
 
     })
 
@@ -1504,9 +1505,9 @@ server <- function(input, output) {
         if(length(input$sensorSel) >= 5){
             autoDF <- data.frame(PurpleAirCEHAT::krigePA(PAhourly, as_datetime(input$date1)+ lubridate::hours(input$hour)))
 
-            names(autoDF)["var1.pred"] <- "predicted"
+            names(autoDF)[3] <- "predicted"
 
-            autoPlot <- ggplot() + geom_tile(autoDF, mapping = aes(x,y,fill=prediction), alpha=0.90) +
+            autoPlot <- ggplot() + geom_tile(autoDF, mapping = aes(x,y,fill=predicted), alpha=0.90) +
                 geom_point(PAhourly[,c('PM2.5',"longitude","latitude")], color ="black", size=2, pch=21, mapping = aes(longitude, latitude, fill=PM2.5), inherit.aes = TRUE) +
                 coord_equal() +
                 scale_fill_continuous(type = "viridis") +
@@ -1530,7 +1531,7 @@ server <- function(input, output) {
         if(length(input$sensorSel) >= 5){
             autoDF <- data.frame(PurpleAirCEHAT::krigePA(PAhourly, as_datetime(input$date1)+ lubridate::hours(input$hour)))
 
-            names(autoDF)["var1.var"] <- "variance"
+            names(autoDF)[4] <- "variance"
 
             autoVars <- ggplot() + geom_tile(autoDF, mapping = aes(x,y,fill=variance), alpha=0.90) +
                 geom_point(PAhourly[,c('PM2.5',"longitude","latitude")], color ="black", size=2, pch=21, mapping =aes(longitude, latitude, fill=PM2.5), inherit.aes = TRUE) +
@@ -1557,7 +1558,7 @@ server <- function(input, output) {
         if(length(input$sensorSel) >= 5){
             autoDF <- data.frame(PurpleAirCEHAT::krigePA(PAhourly, as_datetime(input$date1)+ lubridate::hours(input$hour)))
 
-            names(autoDF)["var1.stdev"] <- "standard deviation"
+            names(autoDF)[5] <- "standard deviation"
 
             autoStDev <- ggplot() + geom_tile(autoDF, mapping = aes(x,y,fill=`standard deviation`), alpha=0.90) +
                 geom_point(PAhourly[,c('PM2.5',"longitude","latitude")], color ="black", size=2, pch=21 , mapping =aes(longitude, latitude, fill=PM2.5), inherit.aes = TRUE) +
@@ -1695,14 +1696,13 @@ server <- function(input, output) {
     )
 
 
-
     output$downloadavgSG <- downloadHandler(
-
+        
         filename = function() {
             req(input$file1)
-
+            
             dates <- c(as.character(format(as.Date(min(PAhourly()$timestamp))),"yyyy-mm-dd"), as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"))
-
+            
             output <- paste("summarySG_", paste(dates, collapse = "_to_"), ".csv", sep = "")
             output
         },
@@ -1711,24 +1711,104 @@ server <- function(input, output) {
         }
     )
 
+    output$downloadReport <- downloadHandler(
+        filename = function() {
+            paste('my-report', sep = '.', switch(
+                input$format, PDF = 'pdf', Word = 'docx'
+            ))
+        },
+        
+        content = function(file) {
+            src <- normalizePath('report.Rmd')
+            
+            # temporarily switch to the temp dir, in case you do not have write
+            # permission to the current working directory
+            owd <- setwd(tempdir())
+            on.exit(setwd(owd))
+            file.copy(src, 'report.Rmd', overwrite = TRUE)
+            
+            params <- list(d1 = input$date1,
+                           d2 = input$date2,
+                           d3 = input$date3,
+                           daily = dailySG(),
+                           dts1 = input$dates1,
+                           dts2 = input$dates2,
+                           dts3 = input$dates3,
+                           dts4 = input$dates4,
+                           down = downSensors(),
+                           highlow = PAhi_lo(),
+                           hour = input$hour,
+                           #matching = matchingDays(),
+                           over = readingsOver(),
+                           #overEPA = overThresholdSG(),
+                           PAhourly = PAhourly(),
+                           sensor = input$sensor,
+                           sensors = input$sensorSel,
+                           summary = summarySG(),
+                           under = readingsUnder() )
+            
+
+            out <- rmarkdown::render('report.Rmd', params = params, switch( input$format,
+                PDF = pdf_document(), Word = word_document()), envir = new.env(parent = globalenv()))
+            file.rename(out, file)
+        }
+    )
+    output$report <- downloadHandler(
+        filename = function() {
+            paste('report', sep = '.', switch(
+                input$format, PDF = 'pdf', Word = 'docx'))
+        },
+        
+        content = function(file) {
+            src <- normalizePath('report.Rmd')
+            
+            # temporarily switch to the temp dir, in case you do not have write
+            # permission to the current working directory
+            owd <- setwd(tempdir())
+            on.exit(setwd(owd))
+            file.copy(src, 'report.Rmd', overwrite = TRUE)
+            
+            params <- list(d1 = input$date1,
+                           d2 = input$date2,
+                           d3 = input$date3,
+                           daily = dailySG(),
+                           dts1 = input$dates1,
+                           dts2 = input$dates2,
+                           dts3 = input$dates3,
+                           dts4 = input$dates4,
+                           down = downSensors(),
+                           highlow = PAhi_lo(),
+                           hour = input$hour,
+                           over = readingsOver(),
+                           PAhourly = PAhourly(),
+                           sensor = input$sensor,
+                           sensors = input$sensorSel,
+                           summary = summarySG(),
+                           under = readingsUnder() )
+            
+            library(rmarkdown)
+            out <- render('report.Rmd', params = params, switch(
+                input$format, PDF = pdf_document(), Word = word_document() ), envir = new.env(parent = globalenv()))
+            file.rename(out, file)
+        }
+    )
 
     output$report <- downloadHandler(
         filename = function() {
             paste('report', sep = '.', switch(
                 input$format, PDF = 'pdf', Word = 'docx'))
         },
-
+        
         content = function(file) {
             src <- normalizePath('report.Rmd')
-
+            
             # temporarily switch to the temp dir, in case you do not have write
             # permission to the current working directory
             owd <- setwd(tempdir())
             on.exit(setwd(owd))
             file.copy(src, 'report.Rmd', overwrite = TRUE)
-
-            params <- list(overEPA = overThresholdSG(),
-                           d1 = input$date1,
+            
+            params <- list(d1 = input$date1,
                            d2 = input$date2,
                            d3 = input$date3,
                            dts1 = input$dates1,
@@ -1741,12 +1821,13 @@ server <- function(input, output) {
                            highlow = PAhi_lo(),
                            matching = matchingDays(),
                            over = readingsOver(),
+                           overEPA = overThresholdSG(),
                            PAhourly = PAhourly(),
                            sensor = input$sensor,
                            sensors = input$sensorSel,
                            summary = summarySG(),
                            under = readingsUnder() )
-
+            
             library(rmarkdown)
             out <- render('report.Rmd', params = params, switch(
                 input$format, PDF = pdf_document(), Word = word_document() ), envir = new.env(parent = globalenv()))
