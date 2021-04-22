@@ -1715,18 +1715,18 @@ server <- function(input, output) {
 
     output$report <- downloadHandler(
         filename = function() {
-            paste('Report', sep = '.', switch(
+            paste('report', sep = '.', switch(
                 input$format, PDF = 'pdf', Word = 'docx'))
         },
 
         content = function(file) {
-            src <- normalizePath('Report.Rmd')
+            src <- normalizePath('report.Rmd')
 
             # temporarily switch to the temp dir, in case you do not have write
             # permission to the current working directory
             owd <- setwd(tempdir())
             on.exit(setwd(owd))
-            file.copy(src, 'Report.Rmd', overwrite = TRUE)
+            file.copy(src, 'report.Rmd', overwrite = TRUE)
 
             params <- list(overEPA = overThresholdSG(),
                            d1 = input$date1,
@@ -1749,7 +1749,7 @@ server <- function(input, output) {
                            under = readingsUnder() )
 
             library(rmarkdown)
-            out <- render('Report.Rmd', params = params, switch(
+            out <- render('report.Rmd', params = params, switch(
                 input$format, PDF = pdf_document(), Word = word_document() ), envir = new.env(parent = globalenv()))
             file.rename(out, file)
         }
