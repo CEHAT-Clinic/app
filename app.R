@@ -74,7 +74,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          br(),
                                          radioButtons('format', strong('Document format'), c('PDF', 'Word')),
                                         # downloadButton("report", "Create report"),
-                                         downloadButton('downloadReport')
+                                         downloadButton('downloadReport', "Generate Report")
 
 
                                 ),
@@ -116,6 +116,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                and refresh each tab with the updated dataset, so that faulty sensors 
                                                do not discredit the validity of the calculated results."),
                                              p("To download this data, click the", strong("Download General South Gate Air Quality Data"), "button below"),
+                                             br(),
                                              downloadButton("downloadavgSG", "Download General South Gate Air Quality Data"),
                                              br(),
                                              
@@ -348,11 +349,10 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                 tabPanel("Comparisons",
 
 
-<<<<<<< HEAD
-                                         h2("South Gate PM2.5 vs. other areas in Southern California "),
-=======
+
+
                                          h2("PM2.5 in South Gate vs. Other AB617 Communities "),
->>>>>>> acf2d77423108d07c055a7cc2f542197e560bec6
+
                                          br(),
                                          h2("The Data"),
                                          p("We are specifically comparing the South Gate data against AQMD data. To find datasets that you can use, visit the",
@@ -378,21 +378,6 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                            we hope that you can get a sense where South Gate's PM2.5 levels stand 
                                            compared to levels in other parts of LA."),
                                          br(),
-<<<<<<< HEAD
-                                         p("The following charts are are box plots that 
-                                           compare the Indio PM2.5 values (left) and the South Gate 
-                                           PM2.5 values (right). The box-and-whisker graphics in the plot 
-                                           are separated into five sections. From bottom to top, they are the minimum, 
-                                           lower quartile, median, the upper quartile, the maximum. You can see specific 
-                                           values for the air quality for both cities by hovering over the plots. "),
-                                         plotlyOutput(outputId = "compareBoxplot"),
-                                         br(),
-                                         p("The following chart is a side-by-side bar chart that shows the daily averages for PM2.5 
-                                           values in both Indio and South Gate with a legend specifying the corresponding colors. 
-                                           If you hover over the bars, you will see the day as 
-                                           well as the daily PM2.5 average."),
-                                         
-=======
                                          
                                          p("The boxplot graphics shown below compare the PM2.5 values from AQMD data for an AB617 
                                          community (left) and the South Gate PM2.5 values (right). The box-and-whisker graphics 
@@ -407,7 +392,6 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          The interactive component of this plot allows users to see the day as well as the daily PM2.5 
                                          average for each bar of the chart."),
                                          br(),
->>>>>>> acf2d77423108d07c055a7cc2f542197e560bec6
                                          plotlyOutput(outputId = "compareBar")
 
                                 ),
@@ -443,20 +427,11 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
                                              plotlyOutput("stdev"),
                                              
-<<<<<<< HEAD
-                                             p("We consider a place in South Gate to be a sensitive location if it is 
-                                             populated by people that are at greater risk for health problems, 
-                                             such as children, older adults, and those with pre-existing health conditions. 
-                                             The following charts predict the AQI values at sensitive locations (including
-                                               8 schools, 5 medical centers, 2 parks, 2 shopping centers, and 3 senior centers) in 
-                                               South Gate at a specific date and time using ordinary kriging. If you hover over
-                                               a location, you will see the name of that location as well as is location (in longitude 
-                                               and latitude) and the predicted AQI value."),
-=======
+
                                              br(),
                                              
                                              h2("Sensitive Locations"),
-                                             p("On the Interpolation and Sensor Placements page, users can also 
+                                             p("On this page, you can also 
                                              find interpolation calculations regarding sensitive locations. We 
                                              consider a place in South Gate to be a sensitive location if it is 
                                              populated by people that are at greater risk for health problems, 
@@ -472,7 +447,6 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              time specified in the sidebar. Each of these graphs are interactive, 
                                                so hovering over a location reveals the predicted PM2.5 value, 
                                                the name of that location, and its longitude and latitude."),
->>>>>>> acf2d77423108d07c055a7cc2f542197e560bec6
                                              
                                              plotlyOutput("schools"),
                                              
@@ -1591,6 +1565,7 @@ server <- function(input, output, session) {
 
         else{ 
             stop("No days are over the EPA threshold for this month.") }
+        
         ggplotly(epahist)
     })
 
@@ -1890,6 +1865,7 @@ server <- function(input, output, session) {
             params <- list(d1 = input$date1,
                            d2 = input$date2,
                            d3 = input$date3,
+                           d4 = input$date4,
                            daily = dailySG(),
                            dts1 = input$dates1,
                            dts2 = input$dates2,
@@ -1940,48 +1916,6 @@ server <- function(input, output, session) {
                            highlow = PAhi_lo(),
                            hour = input$hour,
                            over = readingsOver(),
-                           PAhourly = PAhourly(),
-                           sensor = input$sensor,
-                           sensors = input$sensorSel,
-                           summary = summarySG(),
-                           under = readingsUnder() )
-            
-            library(rmarkdown)
-            out <- render('report.Rmd', params = params, switch(
-                input$format, PDF = pdf_document(), Word = word_document() ), envir = new.env(parent = globalenv()))
-            file.rename(out, file)
-        }
-    )
-
-    output$report <- downloadHandler(
-        filename = function() {
-            paste('report', sep = '.', switch(
-                input$format, PDF = 'pdf', Word = 'docx'))
-        },
-        
-        content = function(file) {
-            src <- normalizePath('report.Rmd')
-            
-            # temporarily switch to the temp dir, in case you do not have write
-            # permission to the current working directory
-            owd <- setwd(tempdir())
-            on.exit(setwd(owd))
-            file.copy(src, 'report.Rmd', overwrite = TRUE)
-            
-            params <- list(d1 = input$date1,
-                           d2 = input$date2,
-                           d3 = input$date3,
-                           dts1 = input$dates1,
-                           dts2 = input$dates2,
-                           dts3 = input$dates3,
-                           dts4 = input$dates4,
-                           daily = dailySG(),
-                           down = downSensors(),
-                           hour = input$hour,
-                           highlow = PAhi_lo(),
-                           matching = matchingDays(),
-                           over = readingsOver(),
-                           overEPA = overThresholdSG(),
                            PAhourly = PAhourly(),
                            sensor = input$sensor,
                            sensors = input$sensorSel,
