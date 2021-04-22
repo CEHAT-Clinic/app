@@ -81,11 +81,14 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
                                 tabPanel("Summary Statistics",
                                          sidebarPanel(
-                                             strong("Hourly Readings for the Week up to the Selected Date:"),
+                                             strong("Hourly Readings for the 72 hours up to the Selected Date:"),
                                              uiOutput("date2"),
                                              br(),
-                                             strong("Hourly Readings for the Month up to the Selected Date:"),
+                                             strong("Daily Readings for the Month up to the Selected Date:"),
                                              uiOutput("date3"),
+                                             br(),
+                                             strong("High and Low Values for the Month up to the Selected Date:"),
+                                             uiOutput("date4"),
                                              br(),
                                              strong("Select date ranges for the density plot:"),
                                              uiOutput("dateRange3"),
@@ -103,9 +106,28 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          ),
 
                                          mainPanel(
-                                             h4("Summary"),
-
-                                             plotlyOutput("pastWeek"),
+                                             h2("Summary"),
+                                             p("The Summary Statistics page is the first section of our data 
+                                               analysis. For each calculation, we refer to the general hourly 
+                                               PM2.5 for South Gate PurpleAir sensors. The general hourly readings 
+                                               are the aggregated PM2.5 values by hour, which is an average of each 
+                                               sensor's hourly PM2.5 readings. Hence, it's important to determine if 
+                                               you need to exclude a particular sensor (or multiple) from the data, 
+                                               and refresh each tab with the updated dataset, so that faulty sensors 
+                                               do not discredit the validity of the calculated results."),
+                                             p("To download this data, click the", strong("Download General South Gate Air Quality Data"), "button below"),
+                                             downloadButton("downloadavgSG", "Download General South Gate Air Quality Data"),
+                                             br(),
+                                             
+                                             p("The chart below depicts the general", em("hourly"), "PM2.5 air quality in South Gate
+                                               for the 72 hours leading up to a date input that you can specify in the sidebar panel, 'Hourly 
+                                               Readings for 72 hours up to the Selected Date:' ."), 
+                                              plotlyOutput("pastWeek"),
+                                             br(),
+                                             p("The chart below shows the general", em("daily"), "PM2.5 air quality for the 30 days 
+                                               leading up to a date input that you can specify in the sidebar panel, under 'Daily 
+                                               Readings for the Month up to the Selected Date:'."),
+                                             
                                              plotlyOutput("pastMonth"),
 
                                              h4("Percentiles of the PM2.5 data"),
@@ -135,33 +157,58 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              p("Percentage of PM2.5 readings in the 'Very Unhealthy' category", verbatimTextOutput("percentagesVU")),
                                              p("Percentage of PM2.5 readings in the 'Hazardous' category", verbatimTextOutput("percentagesH")),
 
-                                             #Output: Data file ----
-                                             DT::dataTableOutput("contents"),
-                                             downloadButton(outputId = "downloadPAhourly", "Download Hourly Sensor Data"),
-
-                                             #Plotly plots
-
-                                             h4("Plots"),
-
-                                             plotlyOutput(outputId = "density"),
-
-                                             #plotlyOutput(outputId = "catsPlot"),
-
+                                             br(),
+                                             p("The plot below shows the general daily high and low PM2.5 values in the form of a lollipop chart."),
                                              plotlyOutput("highlow"),
+                                             
+                                             br(),
+                                             
+                                             p("The EPA sets the 24-hour standard for PM2.5 to be 35 μg/m3 per cubic meter, considering any levels 
+                                               above that threshold to be unsafe. The bar chart below displays the number of PM2.5 readings in 
+                                               South Gate that surpass this 24-hour standard for each day in the observed time frame of the dataset. 
+                                               The graph is interactive, so hovering over a bar will display the specified day and the number of 
+                                               readings that exceeded the EPA threshold that day."),
 
                                              plotlyOutput(outputId = "overThresholdSG"),
+                                             br(),
+                                             
+                                             p("The side-by-side graphs below allows you to compare the 8-hour rolling averages for 
+                                               two different time periods in the data, specified in the sidebar panel under 'Compare 8-hour Averages 
+                                               for Two Different Time Periods'. This is especiially useful for observing air quality values during 
+                                               events that significantly affect particulate matter and air quality, like wildfires."),
 
                                              fluidRow(
                                                  splitLayout(cellWidths = c("50%", "50%"), plotOutput(outputId = "avgs1"), plotOutput(outputId = "avgs2"))
                                              ),
+                                             
+                                             #Output: Data file ----
+                                             DT::dataTableOutput("contents"),
+                                             downloadButton(outputId = "downloadPAhourly", "Download Hourly Sensor Data"),
 
                                              h2("Diurnal Patterns"),
+                                             p("In this section you can explore the diurnal (day-night cycle) patterns. For the three 
+                                               graphs below, the diurnal pattern for a time period specified in the sidebar is shown in 
+                                               blue and is overlain onto the diurnal patterns for the", strong("entire"), "observed 
+                                               time frame in the uploaded PurpleAir data. There are three diurnal graphs of this type: 
+                                               mean, range, and peak/maximum. These are calculated by aggregating the general South Gate 
+                                               PM2.5 data by hour for each of the aforementioned calculations."),
+                                             
+                                             
+                                             p("Note that, the plot displaying the peak PM2.5 value only reports the maximum value 
+                                               reached during that hour. This is", strong("not"), "a report of when most high values 
+                                               are achieved. That is reported in the density plot below."),
 
                                              plotOutput("diurnalAVG"),
+                                             br(),
                                              plotOutput("diurnalMax"),
+                                             br(),
                                              plotOutput("diurnalRange"),
+                                             br(),
+                                             p("The plot below reports the spread of peak values for PM2.5 over 24 hours. This plot is 
+                                               most useful for determining", em(strong("when")), "PM2.5 is at it's most concentrated in South Gate."),
+                                             plotlyOutput(outputId = "density"),
                                              
-                                             downloadButton("downloadavgSG", "Download General South Gate Air Quality Data"),
+                                             
                                              br(),
                                              br(),
                                              br(),
@@ -237,7 +284,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              plotlyOutput(outputId = "overMap"),
                                              br(),
                                              br(),
-                                             p("The following plot two plots correspond to the opposite of the previous two plots, corresponding
+                                             p("The following two plots correspond to the opposite of the previous two plots, corresponding
                                                to the readings under the median, and then the normalized readings under the median, represented spatially."),
                                              plotlyOutput(outputId = "underPlot"),
                                              br(),
@@ -256,23 +303,38 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                by the drop-down selection at the top of the sidebar. In this section, you will find
                                                visualizations for high and low values, EPA categories by percentage, and historical percent
                                                difference data (for data downloaded after March, 30, 2021)."),
+                                             br(),
+                                             p("The chart shown below displays the breakdown (by percentage) of a single sensor's 
+                                               readings by the corresponding EPA AQI category. This chart, along with the corresponding text, 
+                                               allows you to compare the sensor's reading distribution to that of the general South Gate data, which 
+                                               is shown on the Summary Statistics page."),
 
                                              plotOutput("catsBySensor"),
                                              br(),
                                              verbatimTextOutput("catPercentages"),
                                              br(),
+                                             
+                                             p("The plot below is a direct visualization of the mean percent difference field for a particular sensor. 
+                                               This can be used to obsreve how functional the specified sensor has been, and determine if any channels 
+                                               have been downgraded."),
                                              br(),
                                              plotOutput("percentDiff"),
                                              br(),
+                                             p("The lollipop chart shown below is a sensor-specific version of the high and low chart 
+                                               initially shown in the Summary Statistics page. This is accompanied by the sensor-specific 
+                                               histogram of high values of PM2.5. This histogram is overlaid with a distribution curve to 
+                                               investigate normality (or near-normality) in air quality data. The number of bins can be 
+                                               adjusted with the 'Number of bins' slider in the sidebar. This distribution helps inform 
+                                               about how well the sensor is reporting data, and more immediately, if there may be significant 
+                                               environmental factors that interfere with a sensor's reading capability."),
                                              br(),
                                              plotlyOutput(outputId="highlowSensor"),
                                              br(),
                                              br(),
-                                             plotOutput( outputId = "hiloHist"),
-                                             br(),
-                                             br(),
+                                             plotOutput(outputId = "hiloHist"),
                                              
-                                             br(),
+                                             
+                                            
                                              br(),
 
                                              br(),
@@ -286,7 +348,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                 tabPanel("Comparisons",
 
 
-                                         h2("South Gate PM2.5 vs. other areas in LA "),
+                                         h2("PM2.5 in South Gate vs. Other AB617 Communities "),
                                          br(),
                                          h2("The Data"),
                                          p("We are specifically comparing the South Gate data against AQMD data. To find datasets that you can use, visit the",
@@ -303,11 +365,25 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                               ".csv")),
 
                                          h2("Visuals"),
-                                         p("After conducting t tests on these data sets, we have found that:"),
+                                         p("After conducting t-tests on these data sets, we have found that:"),
                                          strong(textOutput("ttests")),
-                                         p("We have also provided a box plot and a bar chart. Through these visuals, we hope that you can get a sense where South Gate's PM2.5 levels stand compared to levels in other parts of LA."),
+                                         p("We have also provided a box plot and a bar chart. Through these visuals, 
+                                           we hope that you can get a sense where South Gate's PM2.5 levels stand 
+                                           compared to levels in other parts of LA."),
                                          br(),
+                                         
+                                         p("The boxplot graphics below compare the PM2.5 values from AQMD data for an AB617 
+                                         community (left) and the South Gate PM2.5 values (right). The box-and-whisker graphics 
+                                         in the plot are separated into five sections. From bottom to top, they are the minimum, 
+                                         lower quartile, median, the upper quartile, the maximum. You can see specific values for 
+                                         the air quality for both cities by hovering over the plots."), 
+                                         
                                          plotlyOutput(outputId = "compareBoxplot"),
+                                         br(),
+                                         p("The side-by-side bar charts below shows the daily averages for PM2.5 values in both 
+                                         a selected AB617 community and South Gate, with a legend specifying the corresponding colors. 
+                                         The interactive component of this plot allows users to see the day as well as the daily PM2.5 
+                                         average for each bar of the chart."),
                                          br(),
                                          plotlyOutput(outputId = "compareBar")
 
@@ -322,11 +398,47 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
 
                                          mainPanel(
+                                             h2("Interpolation Through Ordinary Kriging"),
+                                             
+                                             p("On the Interpolation and Sensor Placements page, you can find the 
+                                               three outputs of the ordinary kriging results computed by the App. 
+                                               This includes the predictions, along with the corresponding variance and 
+                                               standard deviation of those predictions. Each of these plots are interactive
+                                               so that you can hover over the map and observe prediction, variance, or 
+                                               standard deviation values at a specific longitude and latitude. To learn 
+                                               about how kriging interpolation works, visit", a("this webpage",
+                                             href = "https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation")),
+                                             
                                              plotlyOutput("prediction"),
+                                             
+                                             br(),
+                                             
 
                                              plotlyOutput("variance"),
+                                             
+                                             br(),
 
                                              plotlyOutput("stdev"),
+                                             
+                                             br(),
+                                             
+                                             h2("Sensitive Locations"),
+                                             p("On the Interpolation and Sensor Placements page, users can also 
+                                             find interpolation calculations regarding sensitive locations. We 
+                                             consider a place in South Gate to be a sensitive location if it is 
+                                             populated by people that are at greater risk for health problems, 
+                                             such as children, older adults, and those with pre-existing health 
+                                             conditions."),
+                                    
+                                             
+                                             p("Here you have the ability to investigate the air quality 
+                                             near high risk areas in order to take measures to protect those 
+                                             sensitive groups, if necessary. Through ordinary kriging, the App 
+                                             predicts the PM2.5 values at 5 medical centers, 2 parks, 2 
+                                             shopping centers, 3 senior centers, and 8 schools at the date and 
+                                             time specified in the sidebar. Each of these graphs are interactive, 
+                                               so hovering over a location reveals the predicted PM2.5 value, 
+                                               the name of that location, and its longitude and latitude."),
                                              
                                              plotlyOutput("schools"),
                                              
@@ -479,6 +591,19 @@ server <- function(input, output, session) {
                       as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
                   format = "yyyy-mm-dd")
 
+    })
+    
+    output$date4 <- renderUI({
+        req(input$file1)
+        dateInput("date4", "Select the date:",
+                  value =
+                      as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"), # Start
+                  min =
+                      as.character(format(as.Date(min(PAhourly()$timestamp))),"yyyy-mm-dd"),
+                  max =
+                      as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
+                  format = "yyyy-mm-dd")
+        
     })
 
 
@@ -690,17 +815,15 @@ server <- function(input, output, session) {
     ##################################################################################################
 
 
-
     output$maxHour <- renderText({
         req(input$file1)
-        avgSG <- summarySG()
+        
+        PAhi_lo <- PAhi_lo()
+        dates <- input$dates3
+        
+        hourlyDensity <- PAhi_lo[PAhi_lo$type == "high" & lubridate::date(PAhi_lo$timestamp) >= toString(dates[1]) & lubridate::date(PAhi_lo$timestamp) <= toString(dates[2]),] %>% dplyr::count(hour)
 
-
-        diurnalR <- aggregate(cbind(max) ~ hour,
-                              data = avgSG, FUN= function(x) {round(mean(x),2)} )
-
-
-        diurnalR[diurnalR$max == max(diurnalR),][[1]]
+        hourlyDensity[hourlyDensity$n == max(hourlyDensity$n),][[1]]
     })
 
     output$highlow <- renderPlotly({
@@ -713,8 +836,9 @@ server <- function(input, output, session) {
         LowAverage <- mean(dailySG$min)
 
         wessy_pal <- c("high"="#C93312","low"="#899DA4")
+        
 
-        hilo <- ggplot(data=dailySG, aes(x=day, group = day)) +
+        hilo <- ggplot(data=dailySG[dailySG$day <= as.Date(input$date4) & dailySG$day >= as.Date(input$date4)-lubridate::days(30),], aes(x=day, group = day)) +
             geom_segment(aes(x=day, xend=day, y=min,yend=max),lwd=1)+
             geom_point(aes(y=max, col="high"), size=5) +
             geom_point(aes(y=min, col="low"), size=5)+
