@@ -372,7 +372,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                            compared to levels in other parts of LA."),
                                          br(),
                                          
-                                         p("The boxplot graphics below compare the PM2.5 values from AQMD data for an AB617 
+                                         p("The boxplot graphics shown below compare the PM2.5 values from AQMD data for an AB617 
                                          community (left) and the South Gate PM2.5 values (right). The box-and-whisker graphics 
                                          in the plot are separated into five sections. From bottom to top, they are the minimum, 
                                          lower quartile, median, the upper quartile, the maximum. You can see specific values for 
@@ -380,7 +380,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          
                                          plotlyOutput(outputId = "compareBoxplot"),
                                          br(),
-                                         p("The side-by-side bar charts below shows the daily averages for PM2.5 values in both 
+                                         p("The side-by-side bar chart below shows the daily averages for PM2.5 values in both 
                                          a selected AB617 community and South Gate, with a legend specifying the corresponding colors. 
                                          The interactive component of this plot allows users to see the day as well as the daily PM2.5 
                                          average for each bar of the chart."),
