@@ -12,6 +12,7 @@ library(plotly)
 library(tidyverse)
 library(zoo)
 library(gridExtra)
+devtools::install_github("CEHAT-Clinic/analysis")
 library(PurpleAirCEHAT)
 library(markdown)
 library(lubridate)
@@ -20,7 +21,8 @@ library(testthat)
 library(tryCatchLog)
 library(futile.logger)
 
-#sensors <- hourlyPA(cleanPA(read.csv("december2020_readings.csv")),FALSE)
+pat <- Sys.getenv('GITHUB_PAT')
+
 #set the max file size to be 1000 Mb
 options(shiny.maxRequestSize = 10000*1024^2)
 
@@ -42,7 +44,8 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          h2("Introduction"),
                                          p("Welcome to the South Gate CEHAT Data Analysis report"),
                                          br(),
-                                         p("First, select your", strong("PurpleAir csv file,"), "answer the question asked, then confirm which sensors you wish to include"),
+                                         p("First, select your", strong("PurpleAir csv file,"), 
+                                           "answer the question asked, then confirm which sensors you wish to include"),
                                          br(),
 
                                          # Input: Select a file ---- PurpleAir
@@ -340,8 +343,6 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
                                              br(),
                                              br(),
-                                             br(),
-                                             br()
 
 
                                          )
@@ -426,7 +427,6 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              br(),
 
                                              plotlyOutput("stdev"),
-                                             
 
                                              br(),
                                              
@@ -1930,7 +1930,8 @@ server <- function(input, output, session) {
     )
 
 
-
+    # handling deployment errors
+    
     test_that("error handler with unwrapped 0-param R function does throw an error", {
 
         expect_error(
@@ -1950,6 +1951,16 @@ server <- function(input, output, session) {
                         cat("Warning message:\n",txt,'\n',sep = "")
                     }
                 }))
+    
+    github_pat <- function() {
+        pat <- Sys.getenv('GITHUB_PAT')
+        if (identical(pat, "")) {
+            stop("Please set env var GITHUB_PAT to your github personal access token",
+                 call. = FALSE)
+        }
+        
+        pat
+    }
 
 } #--server
 
