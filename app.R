@@ -30,14 +30,14 @@ options(shiny.maxRequestSize = 10000*1024^2)
 # Define UI
 
 ui <- fluidPage(theme = shinytheme("lumen"),
-
+                
                 # App title ----
                 titlePanel("Interactive Data Analysis Report"),
-
+                
                 # Sidebar layout with input and output definitions ----
-
+                
                 mainPanel(
-
+                    
                     # Output: Tabset w/ plot, summary, and table ----
                     tabsetPanel(type = "tabs",
                                 tabPanel("Overview",
@@ -47,14 +47,14 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          p("First, select your", strong("PurpleAir csv file,"), 
                                            "answer the question asked, then confirm which sensors you wish to include"),
                                          br(),
-
+                                         
                                          # Input: Select a file ---- PurpleAir
                                          fileInput("file1", "Choose PurpleAir CSV File",
                                                    multiple = TRUE,
                                                    accept = c("text/csv",
                                                               "text/comma-separated-values,text/plain",
                                                               ".csv")),
-
+                                         
                                          radioButtons("answer", label = "Was this data downloaded after March 30, 2021?",
                                                       choices = list("Yes" = "Y", "No" = "N")),
                                          br(),
@@ -64,25 +64,25 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          panel( uiOutput("sensorSel"),
                                                 actionButton("button", "Confirm")
                                          ),
-
+                                         
                                          DT::dataTableOutput("sensorsTable"),
                                          br(),
-
+                                         
                                          strong("Note that none of these pages will populate without a file input!"),
-
-
+                                         
+                                         
                                          br(),
-                                         p("After creating the desired plots, download this report as a pdf or a word document by clicking the", strong(em("Generate Report")), "button below."),
-                                         p("To create an editable report, select the 'Word Document' option. Otherwise, leave the format set to PDF."),
+                                         p("After creating the desired plots, download this report as a pdf or a word document by clicking the", strong(em("Create Report")), "button below."),
+                                         p("To create an static, uneditable report, select the 'PDF Document' option. Otherwise, leave the format set to Word"),
                                          p("The report can only be uploaded with datasets that have been generated, so make sure to go to each page to ensure every plot is loaded."),
                                          br(),
-                                         radioButtons('format', strong('Document format'), c('PDF', 'Word')),
-                                        downloadButton("Report", "Create report"),
+                                         radioButtons('format', strong('Document format'), c('Word','PDF')),
+                                         downloadButton("Report", "Create report"),
                                          #downloadButton('Report', "Generate Report")
-
-
+                                         
+                                         
                                 ),
-
+                                
                                 tabPanel("Summary Statistics",
                                          sidebarPanel(
                                              strong("Hourly Readings for the 72 hours up to the Selected Date:"),
@@ -97,18 +97,18 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              strong("Select date ranges for the density plot:"),
                                              uiOutput("dateRange3"),
                                              br(),
-
+                                             
                                              strong("Compare 8-hour Averages for Two Different Time Periods"),
                                              uiOutput("dateRange1"),
                                              uiOutput("dateRange2"),
                                              br(),
-
+                                             
                                              strong("Compare Diurnal Patterns to a Shorter Time Period"),
                                              uiOutput("dateRange4")
-
-
+                                             
+                                             
                                          ),
-
+                                         
                                          mainPanel(
                                              h2("Summary"),
                                              p("The Summary Statistics page is the first section of our data 
@@ -128,14 +128,14 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              p("The chart below depicts the general", em("hourly"), "PM2.5 air quality in South Gate
                                                for the 72 hours leading up to a date input that you can specify in the sidebar panel, 'Hourly 
                                                Readings for 72 hours up to the Selected Date:' ."), 
-                                              plotlyOutput("pastWeek"),
+                                             plotlyOutput("pastWeek"),
                                              br(),
                                              p("The chart below shows the general", em("daily"), "PM2.5 air quality for the 30 days 
                                                leading up to a date input that you can specify in the sidebar panel, under 'Daily 
                                                Readings for the Month up to the Selected Date:'."),
                                              
                                              plotlyOutput("pastMonth"),
-
+                                             
                                              h4("Percentiles of the PM2.5 data"),
                                              p("25% of the PM2.5 readings lie below", verbatimTextOutput("percentiles1")),
                                              p("33% of the PM2.5 readings lie below", verbatimTextOutput("percentiles2")),
@@ -145,7 +145,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              p("95% of the PM2.5 readings lie below", verbatimTextOutput("percentiles6")),
                                              br(),
                                              h4("Second Max for 24-hour PM2.5:",  verbatimTextOutput("secondMax")),
-
+                                             
                                              br(),
                                              h4("For the given PurpleAir Data"),
                                              # p("The number of days over EPA threshold from:"),
@@ -162,7 +162,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              p("Percentage of PM2.5 readings in the 'Unhealthy' category", verbatimTextOutput("percentagesU")),
                                              p("Percentage of PM2.5 readings in the 'Very Unhealthy' category", verbatimTextOutput("percentagesVU")),
                                              p("Percentage of PM2.5 readings in the 'Hazardous' category", verbatimTextOutput("percentagesH")),
-
+                                             
                                              br(),
                                              p("The plot below shows the general daily high and low PM2.5 values in the form of a lollipop chart."),
                                              plotlyOutput("highlow"),
@@ -175,7 +175,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                The graph is interactive, so hovering over a bar will display the specified day and the number of 
                                                readings that exceeded the EPA threshold that day. Note that if the plot is blank, it means that 
                                                there were no readings over the EPA threshold for that time period."),
-
+                                             
                                              plotlyOutput(outputId = "overThresholdSG"),
                                              br(),
                                              
@@ -183,7 +183,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                two different time periods in the data, specified in the sidebar panel under 'Compare 8-hour Averages 
                                                for Two Different Time Periods'. This is especiially useful for observing air quality values during 
                                                events that significantly affect particulate matter and air quality, like wildfires."),
-
+                                             
                                              fluidRow(
                                                  splitLayout(cellWidths = c("50%", "50%"), plotOutput(outputId = "avgs1"), plotOutput(outputId = "avgs2"))
                                              ),
@@ -198,7 +198,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              downloadButton(outputId = "downloadPAhourly", "Download Hourly Sensor Data"),
                                              br(),
                                              br(),
-
+                                             
                                              h2("Diurnal Patterns"),
                                              p("In this section you can explore the diurnal (day-night cycle) patterns. For the three 
                                                graphs below, the diurnal pattern for a time period specified in the sidebar is shown in 
@@ -211,7 +211,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              p("Note that, the plot displaying the peak PM2.5 value only reports the maximum value 
                                                reached during that hour. This is", strong("not"), "a report of when most high values 
                                                are achieved. That is reported in the density plot below."),
-
+                                             
                                              plotOutput("diurnalAVG"),
                                              br(),
                                              plotOutput("diurnalMax"),
@@ -227,37 +227,37 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              br(),
                                              br(),
                                              br()
-
-
-
+                                             
+                                             
+                                             
                                          ) #- mainPanel
                                 ), #-tabPanel 1
-
-
+                                
+                                
                                 tabPanel("Sensor Summaries",
                                          
-
+                                         
                                          sidebarPanel(
-
+                                             
                                              uiOutput("sensorSel_HL"),
                                              
                                              p("Histogram of Highs Slider"),
                                              selectInput("n_breaks", label = "Number of bins:",
                                                          choices = c(4, 8, 16, 24), selected = 8)
-
+                                             
                                          ),
                                          mainPanel(
-
-
+                                             
+                                             
                                              h2("Maintaining the Sensor Network"),
                                              p("On this page, you can find several plots that showcase different 
                                                 aspects of sensors functionality, including how often they go down, 
                                                which EPA categories they tend to report, and which sensors typically 
                                                report higher, or lower, values."),
-
-
+                                             
+                                             
                                              br(),
-
+                                             
                                              h3("Network-based Observations"),
                                              p("This section shows plots that include all of the sensors. These plots allow
                                                for a holistic inspection of the sensor network, showing where sensors report
@@ -273,7 +273,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              plotlyOutput("catsSensors"),
                                              br(),
                                              br(),
-
+                                             
                                              p("The chart below reports the number of days during which a sensor did not report any
                                                PM2.5 readings. Keep in mind that, for any sensors that are activated, or deactivated,
                                                during the timeframe observed in the data, this chart will report that as being 'down',
@@ -304,13 +304,13 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              br(),
                                              br(),
                                              plotlyOutput(outputId = "underMap"),
-
-
+                                             
+                                             
                                              br(),
-
+                                             
                                              br(),
-
-
+                                             
+                                             
                                              br(),
                                              h3("Single-Sensor Observations"),
                                              p("This section displays plots and observations for an individual sensor, which is selected
@@ -322,7 +322,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                readings by the corresponding EPA AQI category. This chart, along with the corresponding text, 
                                                allows you to compare the sensor's reading distribution to that of the general South Gate data, which 
                                                is shown on the Summary Statistics page."),
-
+                                             
                                              plotOutput("catsBySensor"),
                                              br(),
                                              verbatimTextOutput("catPercentages"),
@@ -348,22 +348,22 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              plotOutput(outputId = "hiloHist"),
                                              
                                              
-                                            
+                                             
                                              br(),
-
+                                             
                                              br(),
                                              br(),
-
-
+                                             
+                                             
                                          )
                                 ),
                                 tabPanel("Comparisons",
-
-
-
-
+                                         
+                                         
+                                         
+                                         
                                          h2("PM2.5 in South Gate vs. Other AB617 Communities "),
-
+                                         
                                          br(),
                                          h2("The Data"),
                                          p("We are specifically comparing the South Gate data against AQMD data. To find datasets that you can use, visit the",
@@ -372,16 +372,16 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                            populate with plots, the days in the AQMD data and in the PurpleAir data must overlap. So, for example, you can not upload PurpleAir data
                                            from December and AQMD from April.")),
                                          
-
+                                         
                                          #strong("Upload your", em("AQMD csv file"), "here:"),
-
+                                         
                                          # Input: Select a file ---- AQMD
                                          fileInput("file2", "Choose AQMD CSV File",
                                                    multiple = TRUE,
                                                    accept = c("text/csv",
                                                               "text/comma-separated-values,text/plain",
                                                               ".csv")),
-
+                                         
                                          h2("Visuals"),
                                          p("After conducting t-tests on these data sets, we have found that:"),
                                          strong(textOutput("ttests")),
@@ -404,17 +404,17 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          average for each bar of the chart."),
                                          br(),
                                          plotlyOutput(outputId = "compareBar")
-
+                                         
                                 ),
                                 tabPanel("Interpolation and Sensor Placement",
                                          sidebarPanel(
-
+                                             
                                              uiOutput("date1"),
                                              uiOutput("hour")
-
+                                             
                                          ),
-
-
+                                         
+                                         
                                          mainPanel(
                                              h2("Interpolation Through Ordinary Kriging"),
                                              
@@ -424,22 +424,22 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                standard deviation of those predictions. Each of these plots are interactive
                                                so that you can hover over the map and observe prediction, variance, or 
                                                standard deviation values at a specific longitude and latitude. To learn 
-                                               about how kriging interpolation works, visit", a("this webpage",
-                                             href = "https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation"), 
-                                             strong("If you move the slider to a time before the first timestamp recording in the dataset, the interpolation page
+                                               about how kriging interpolation works, visit", a("this webpage.",
+                                                                                                href = "https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation"), 
+                                               strong("If you move the slider to a time before the first recorded timestamp in the dataset, the interpolation page
                                                     will not populate. You will get the following error: 'cannot derive coordinates from non-numeric matrix.'")),
                                              
                                              plotlyOutput("prediction"),
                                              
                                              br(),
                                              
-
+                                             
                                              plotlyOutput("variance"),
                                              
                                              br(),
-
+                                             
                                              plotlyOutput("stdev"),
-
+                                             
                                              br(),
                                              
                                              h2("Sensitive Locations"),
@@ -449,7 +449,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              populated by people that are at greater risk for health problems, 
                                              such as children, older adults, and those with pre-existing health 
                                              conditions."),
-                                    
+                                             
                                              
                                              p("Here you have the ability to investigate the air quality 
                                              near high risk areas in order to take measures to protect those 
@@ -467,15 +467,15 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              plotlyOutput("medicalCenters"),
                                              
                                              plotlyOutput("seniorCenters"),
-
+                                             
                                              br(),
                                              br(),
                                              br(),
                                              br()
-
+                                             
                                          )
-
-
+                                         
+                                         
                                 ) #- tabPanel 3
                     ) #- tabsetPanel
                 ) #- MAIN PANEL
@@ -488,32 +488,32 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
 # Define server function
 server <- function(input, output, session) {
-
+    
     ##############################################
     # RENDERING UI FOR DATA-DEPENDENT INPUTS
     ##############################################
     
-
+    
     output$sensorSel <- renderUI({
         req(input$file1)
         sensors <- sensors()
-
+        
         pickerInput("sensorSel","Include sensors:",
                     choices = sensors$names,
                     options = list(`actions-box` = TRUE), multiple = T, selected = sensors$names)
     })
-
-
+    
+    
     output$sensorSel_HL <- renderUI({
         req(input$file1)
         sensors <- sensorsList()
-
+        
         selectInput("sensor", label = "Select sensor:",
                     choices = sensors$names, selected = sensors$names[1])
-
+        
     })
-
-
+    
+    
     output$dateRange1 <- renderUI({
         req(input$file1)
         dateRangeInput("dates1", "Select the date range:",
@@ -526,9 +526,9 @@ server <- function(input, output, session) {
                        max =
                            as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
                        format = "yyyy-mm-dd")
-
+        
     })
-
+    
     output$dateRange2 <- renderUI({
         req(input$file1)
         dateRangeInput("dates2", "Select the date range:",
@@ -541,9 +541,9 @@ server <- function(input, output, session) {
                        max =
                            as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
                        format = "yyyy-mm-dd")
-
+        
     })
-
+    
     output$dateRange3 <- renderUI({
         req(input$file1)
         dateRangeInput("dates3", "Select the date range:",
@@ -556,9 +556,9 @@ server <- function(input, output, session) {
                        max =
                            as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
                        format = "yyyy-mm-dd")
-
+        
     })
-
+    
     output$dateRange4 <- renderUI({
         req(input$file1)
         dateRangeInput("dates4", "Select the date range:",
@@ -571,9 +571,9 @@ server <- function(input, output, session) {
                        max =
                            as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
                        format = "yyyy-mm-dd")
-
+        
     })
-
+    
     output$date1 <- renderUI({
         req(input$file1)
         dateInput("date1", "Select the date:",
@@ -584,9 +584,9 @@ server <- function(input, output, session) {
                   max =
                       as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
                   format = "yyyy-mm-dd")
-
+        
     })
-
+    
     output$date2 <- renderUI({
         req(input$file1)
         dateInput("date2", "Select the date:",
@@ -597,9 +597,9 @@ server <- function(input, output, session) {
                   max =
                       as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
                   format = "yyyy-mm-dd")
-
+        
     })
-
+    
     output$date3 <- renderUI({
         req(input$file1)
         dateInput("date3", "Select the date:",
@@ -610,7 +610,7 @@ server <- function(input, output, session) {
                   max =
                       as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"),
                   format = "yyyy-mm-dd")
-
+        
     })
     
     output$date4 <- renderUI({
@@ -625,56 +625,56 @@ server <- function(input, output, session) {
                   format = "yyyy-mm-dd")
         
     })
-
-
+    
+    
     output$hour <- renderUI({
         req(input$file1)
-
+        
         sliderInput("hour", label = strong("Choose hour"), min = 0,
                     max = 24, value = lubridate::hour(PAhourly()$timestamp[1]) )
-
+        
     })
-
-
+    
+    
     ################################################################################################
     # DEFINING REACTIVE OBJECTS
     ################################################################################################
-
+    
     PAfull <- reactive({
         req(input$file1)
-
+        
         messyPA <- read.csv(input$file1$datapath)
-
+        
         PAfull <- PurpleAirCEHAT::cleanPA(messyPA)
-
+        
         return(PAfull)
-
+        
     })
-
+    
     newPAfull <- reactive({
         req(input$file1)
-
+        
         messyPA <- read.csv(input$file1$datapath, quote= '"')
         PAfull <- PurpleAirCEHAT::newCleanPA(messyPA)
-
+        
         return(PAfull)
     })
-
+    
     sensors <- reactive({
         req(input$file1)
-
+        
         if(input$answer == "Y" ){
             sensors <- unique(newPAfull()$names)
             sensors <- data.frame(names=sensors)}
-
+        
         else if (input$answer == "N"){
             sensors <- unique(PAfull()[,c("longitude","latitude")])
             #adding the names of 11 sensors
             #to add another sensor, end the previous line with a comma, and input the following info for the new sensor:
             #     longitude == -118.1965 & latitude == 33.93868 ~ "Sensor: CEHAT 8",
             #     longitude == <longitude> & latitude == <latitude> ~ "<name>")
-
-
+            
+            
             sensors <- dplyr::mutate(sensors,
                                      names = case_when(longitude == -118.1901 & latitude == 33.94106 ~ "Sensor: SCSG-14",
                                                        longitude == -118.1953 & latitude == 33.94354 ~ "Sensor: CEHAT 7-CD",
@@ -688,152 +688,151 @@ server <- function(input, output, session) {
                                                        longitude == -118.1965 & latitude == 33.93868 ~ "Sensor: CEHAT 8",
                                                        longitude == -118.2181 & latitude == 33.96192 ~ "Sensor: CEHAT 3")
             )}
-
-
-
+        
+        
+        
         return(sensors)
     })
-
-
-
+    
+    
+    
     sensorsList <- reactiveVal(data.frame())
-
+    
     observeEvent(input$button, {
-
+        
         sensorsList(sensors())
-
+        
         sensorsList(sensorsList() %>%
                         dplyr::filter(names %in% input$sensorSel))
-
+        
     })
-
-
-
+    
+    
+    
     PAhourly <- reactive({
         req(input$file1)
         req(input$answer)
-
-
+        
+        
         sensors <- sensorsList()
-
+        
         if(input$answer == "Y" ){
             PAfull <- newPAfull()
             PAhourly <- PurpleAirCEHAT::hourlyPA(PAfull, TRUE)
             PAhourly <- PAhourly[PAhourly$PM2.5 <= mean(PAhourly$PM2.5)*20,]}
-
+        
         else if (input$answer == "N"){
             PAfull <- PAfull()
             PAhourly <- PurpleAirCEHAT::hourlyPA(PAfull, FALSE)
             PAhourly <- PAhourly[PAhourly$PM2.5 <= mean(PAhourly$PM2.5)*20,]}
-
-
+        
+        
         PAhourly %>%
             dplyr::filter(names %in% sensors$names)
-
+        
     })
-
-
+    
+    
     summarySG <-reactive({
         req(input$file1)
         PAhourly <- PAhourly()
-
+        
         avgSG <- PurpleAirCEHAT::summarySG(PAhourly)
         return(avgSG)
     })
-
+    
     dailySG <-reactive({
         req(input$file1)
         PAhourly <- PAhourly()
-
+        
         avgSG <- PurpleAirCEHAT::dailySG(PAhourly)
         return(avgSG)
     })
-
-
+    
+    
     PAhi_lo <- reactive({
         req(input$file1)
         PAhourly <- PAhourly()
-
+        
         PAhi_lo <- PurpleAirCEHAT::highslows(PAhourly)
-
+        
         return(PAhi_lo)
     })
-
-
+    
+    
     matchingDays <- reactive({
         req(input$file1)
         req(input$file2)
-
+        
         aqmd <- read.csv(input$file2$datapath)
         PAhourly <- PAhourly()
         avgSG <- summarySG()
-
+        
         matchingDays <- PurpleAirCEHAT::matchingDays(avgSG,aqmd)
-
+        
         return(matchingDays)
-
+        
     })
-
-
-
+    
+    
     overEPAthresholdSG <- reactive({
         req(input$file1)
-
+        
         summarySG <- summarySG()
         overEPA <- PurpleAirCEHAT::overEPA(summarySG)
-
+        
         return(overEPA)
     })
-
-
+    
+    
     downSensors <- reactive({
         req(input$file1)
-
+        
         PAhourly <- PAhourly()
-
+        
         if(input$answer == "Y" ){downSensors <- PurpleAirCEHAT::downSensors(PAhourly, TRUE )}
-
+        
         else if (input$answer == "N"){downSensors <- PurpleAirCEHAT::downSensors(PAhourly, FALSE )}
-
+        
         return(downSensors[[2]])
     })
-
+    
     readingsOver <- reactive({
         req(input$file1)
-
+        
         PAhourly <- PAhourly()
         avgSG <- summarySG()
-
+        
         PAhourly <- dplyr::left_join(PAhourly, avgSG, by = c("timestamp", "hour", "day"), keep=F)
-
+        
         if(input$answer == "Y" ){readings_overCT <- PurpleAirCEHAT::compareSensors(PAhourly,'a', TRUE)}
-
+        
         else if (input$answer == "N"){readings_overCT <- PurpleAirCEHAT::compareSensors(PAhourly,'a', FALSE)}
-
+        
         return(readings_overCT)
     })
-
-
+    
+    
     readingsUnder <- reactive({
         req(input$file1)
-
+        
         PAhourly <- PAhourly()
         avgSG <- summarySG()
-
+        
         PAhourly <- dplyr::left_join(PAhourly, avgSG, by = c("timestamp", "hour", "day"), keep=F)
-
+        
         if(input$answer == "Y" ){readings_underCT <- PurpleAirCEHAT::compareSensors(PAhourly,'b', TRUE)}
-
+        
         else if (input$answer == "N"){readings_underCT <- PurpleAirCEHAT::compareSensors(PAhourly,'b', FALSE)}
-
+        
         return(readings_underCT)
     })
-
+    
     ##################################################################################################
     # RENDERING PLOTS, TEXT, and TABLES
     ##################################################################################################
-
-
+    
+    
     output$maxHour <- renderText({
         req(input$file1)
         
@@ -841,22 +840,22 @@ server <- function(input, output, session) {
         dates <- input$dates3
         
         hourlyDensity <- PAhi_lo[PAhi_lo$type == "high" & lubridate::date(PAhi_lo$timestamp) >= toString(dates[1]) & lubridate::date(PAhi_lo$timestamp) <= toString(dates[2]),] %>% dplyr::count(hour)
-
+        
         hourlyDensity[hourlyDensity$n == max(hourlyDensity$n),][[1]]
     })
-
+    
     output$highlow <- renderPlotly({
         req(input$file1)
-
+        
         dailySG <- dailySG()
-
+        
         HighAverage <- mean(dailySG$max)
-
+        
         LowAverage <- mean(dailySG$min)
-
+        
         wessy_pal <- c("high"="#C93312","low"="#899DA4")
         
-
+        
         hilo <- ggplot(data=dailySG[dailySG$day <= as.Date(input$date4) & dailySG$day >= as.Date(input$date4)-lubridate::days(30),], aes(x=day, group = day)) +
             geom_segment(aes(x=day, xend=day, y=min,yend=max),lwd=1)+
             geom_point(aes(y=max, col="high"), size=5) +
@@ -867,98 +866,98 @@ server <- function(input, output, session) {
             scale_colour_manual(name="Type",values=wessy_pal, guide = guide_legend(override.aes=aes(fill=NA)) ) +
             ggtitle("Daily Highs and Lows") +
             theme_minimal()
-
+        
         ggplotly(hilo)
     })
-
-
+    
+    
     output$diurnalRange <- renderPlot({
         req(input$file1)
         avgSG <- summarySG()
-
+        
         dates <- input$dates4
-
+        
         diurnalR <- aggregate(cbind(range) ~ hour,
                               data = avgSG, FUN= function(x) {round(mean(x),2)} )
-
+        
         addDiurnal <- aggregate(cbind(range) ~ hour,
                                 data = avgSG[lubridate::date(avgSG$timestamp) >= toString(dates[1]) &
                                                  lubridate::date(avgSG$timestamp) <= toString(dates[2]),],
                                 FUN= function(x) {round(mean(x),2)} )
-
+        
         #creating a dynamic scale for the plot
         min1 <- min(diurnalR)
         min2 <- min(addDiurnal)
-
+        
         max1 <- max(diurnalR)
         max2 <- max(addDiurnal)
-
+        
         plot(diurnalR,type="o", lwd=1.5, main = "Range of PM2.5 Values", xlab= "Hour", ylab="PM2.5 (μg/m3)", ylim=c(min(min1,min2), max(max1,max2)))
         lines(addDiurnal,type="o", lwd=1.5, col="blue")
         grid()
     })
-
+    
     output$diurnalMax <- renderPlot({
         req(input$file1)
         avgSG <- summarySG()
-
+        
         dates <- input$dates4
-
+        
         diurnalR <- aggregate(cbind(max) ~ hour,
                               data = avgSG, FUN= function(x) {round(mean(x),2)} )
-
+        
         addDiurnal <- aggregate(cbind(max) ~ hour,
                                 data = avgSG[lubridate::date(avgSG$timestamp) >= toString(dates[1]) &
                                                  lubridate::date(avgSG$timestamp) <= toString(dates[2]),],
                                 FUN= function(x) {round(mean(x),2)} )
-
+        
         #creating a dynamic scale for the plot
         min1 <- min(diurnalR)
         min2 <- min(addDiurnal)
-
+        
         max1 <- max(diurnalR)
         max2 <- max(addDiurnal)
-
+        
         plot(diurnalR,type="o", lwd=1.5, main = "Peak PM2.5 Values", xlab= "Hour", ylab="PM2.5 (μg/m3)", ylim=c(min(min1,min2), max(max1,max2)))
         lines(addDiurnal, type="o", lwd=1.5, col="blue")
         grid()
     })
-
+    
     output$diurnalAVG <- renderPlot({
         req(input$file1)
         avgSG <- summarySG()
-
+        
         dates <- input$dates4
-
+        
         diurnalR <- aggregate(cbind(average_PM2.5) ~ hour,
                               data = avgSG, FUN= function(x) {round(mean(x),2)} )
-
+        
         addDiurnal <- aggregate(cbind(average_PM2.5) ~ hour,
                                 data = avgSG[as.Date(avgSG$timestamp, tz = "America/Los_Angeles") >= as.Date(dates[1], tz = "America/Los_Angeles") &
                                                  as.Date(avgSG$timestamp, tz = "America/Los_Angeles") <= as.Date(dates[2], tz = "America/Los_Angeles"),],
                                 FUN= function(x) {round(mean(x),2)} )
-
+        
         #creating a dynamic scale for the plot
         min1 <- min(diurnalR)
         min2 <- min(addDiurnal)
-
+        
         max1 <- max(diurnalR)
         max2 <- max(addDiurnal)
-
+        
         plot(diurnalR,type="o", lwd=1.5, main = "Average PM2.5 Values", xlab= "Hour", ylab="PM2.5 (μg/m3)", ylim=c(min(min1,min2), max(max1,max2)))
         lines(addDiurnal,type="o", lwd=1.5, col="blue")
         grid()
     })
-
-
+    
+    
     output$pastMonth <- renderPlotly({
         req(input$file1)
         avgSG <- dailySG()
-
+        
         Average <- mean(avgSG$average_PM2.5)
-
+        
         EPAcols <- c("Good"="#00e400", "Moderate"="#ffff00","Unhealthy for Sensitive Groups" = "#ff7e00", "Unhealthy" = "#ff0000", "Very Unhealthy" = "#8f3f97", "Hazardous" = "#7e0023")
-
+        
         historical <- ggplot(avgSG[avgSG$day <= as.Date(input$date3) & avgSG$day >= as.Date(input$date3)-lubridate::days(30),], aes(x=day,y=average_PM2.5, group=category))+
             geom_hline(aes(yintercept = Average), color="blue", linetype="dashed")+
             geom_col(aes(fill=category),col=1, lwd=0.5)+
@@ -967,19 +966,19 @@ server <- function(input, output, session) {
             theme_minimal()+
             scale_fill_discrete(type=EPAcols)+
             theme(axis.text.x = element_text(angle = 75, hjust=1))
-
-
+        
+        
         ggplotly(historical)
     })
-
-
+    
+    
     output$pastWeek <- renderPlotly({
         req(input$file1)
         avgSG <- summarySG()
         Average <- mean(avgSG$average_PM2.5)
-
+        
         EPAcols <- c("Good"="#00e400", "Moderate"="#ffff00","Unhealthy for Sensitive Groups" = "#ff7e00", "Unhealthy" = "#ff0000", "Very Unhealthy" = "#8f3f97", "Hazardous" = "#7e0023")
-
+        
         historical <- ggplot(avgSG[avgSG$timestamp <= as_datetime(input$date2) & avgSG$timestamp >= as_datetime(input$date2)-lubridate::days(3),], aes(x=as_datetime(timestamp),y=average_PM2.5, group=category))+
             geom_hline(aes(yintercept = Average), color="blue", linetype="dashed")+
             geom_col(aes(fill=category),col=1, lwd=0.5)+
@@ -989,18 +988,18 @@ server <- function(input, output, session) {
             theme_minimal()+
             scale_fill_discrete(type=EPAcols)+
             theme(axis.text.x = element_text(angle = 75, hjust=1))
-
-
+        
+        
         ggplotly(historical)
     })
-
+    
     output$catsBySensor <- renderPlot({
         req(input$file1)
-
+        
         PAhourly <- PAhourly()
-
+        
         EPAcols <- c("Good"="#00e400", "Moderate"="#ffff00","Unhealthy for Sensitive Groups" = "#ff7e00", "Unhealthy" = "#ff0000", "Very Unhealthy" = "#8f3f97", "Hazardous" = "#7e0023")
-
+        
         print(ggplot(PAhourly[PAhourly$names == input$sensor,], aes(x=category, group=category)) +
                   geom_histogram(aes(y=after_stat(count/nrow(PAhourly[PAhourly$names == input$sensor,])), fill=category), stat="count", lwd=0.5, col="black")+
                   labs(x = "Sensors", y = "Count") +
@@ -1008,9 +1007,9 @@ server <- function(input, output, session) {
                   theme_minimal()+
                   scale_fill_discrete(type=EPAcols)+
                   theme(axis.text.x = element_text(angle = 75, hjust=1))
-
+              
         )
-
+        
     })
     
     
@@ -1025,34 +1024,34 @@ server <- function(input, output, session) {
             g <- "0%"
         }
         else if(x[x$category == "Good",2]/sum(x[,2])<0.01){
-            g <- "less than 0.01%"
+            g <- "less than 1%"
         }
-        else{g<-paste(round(x[x$category == "Good",2]/sum(x[,2]), 2),"%")}
+        else{g<-paste(round(x[x$category == "Good",2]/sum(x[,2])*100, 2),"%")}
         
         
         if(length(x[x$category == "Moderate",2])==0){
             m <- "0%"
         }
         else if(x[x$category == "Moderate",2]/sum(x[,2])<0.01){
-            m <- "less than 0.01%"
+            m <- "less than 1%"
         }
-        else{m<-paste(round(x[x$category == "Moderate",2]/sum(x[,2]), 2),"%")}
+        else{m<-paste(round(x[x$category == "Moderate",2]/sum(x[,2])*100, 2),"%")}
         
-    
+        
         if(length(x[x$category == "Unhealthy for Sensitive Groups",2])==0){
             ufsg <- "0%"
         }
         else if(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])<0.01){
-            ufsg <- "less than 0.01%"
+            ufsg <- "less than 1%"
         }
-        else{ufsg<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2]), 2),"%")}
-    
+        else{ufsg<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])*100, 2),"%")}
+        
         
         if(length(x[x$category == "Unhealthy",2])==0){
             u <- "0%"
         }
         else if(x[x$category == "Unhealthy",2]/sum(x[,2])<0.01){
-            u <- "less than 0.01%"
+            u <- "less than 1%"
         }
         else{u<-paste(round(x[x$category == "Unhealthy",2]/sum(x[,2]), 2),"%")}
         
@@ -1061,18 +1060,18 @@ server <- function(input, output, session) {
             vu <- "0%"
         }
         else if(x[x$category == "Very Unhealthy",2]/sum(x[,2])<0.01){
-            vu <- "less than 0.01%"
+            vu <- "less than 1%"
         }
-        else{vu<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2]), 2),"%")}
+        else{vu<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2])*100, 2),"%")}
         
         
         if(length(x[x$category == "Hazardous",2])==0){
             h <- "0%"
         }
         else if(x[x$category == "Hazardous",2]/sum(x[,2])<0.01){
-            h <- "less than 0.01%"
+            h <- "less than 1%"
         }
-        else{h<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2]), 2),"%")}
+        else{h<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2])*100, 2),"%")}
         
         
         
@@ -1086,14 +1085,14 @@ server <- function(input, output, session) {
         output
         
     })
-
+    
     output$catsSensors <- renderPlotly({
         req(input$file1)
-
+        
         PAhourly <- PAhourly()
-
+        
         EPAcols <- c("Good"="#00e400", "Moderate"="#ffff00","Unhealthy for Sensitive Groups" = "#ff7e00", "Unhealthy" = "#ff0000", "Very Unhealthy" = "#8f3f97", "Hazardous" = "#7e0023")
-
+        
         plot <- ggplot(PAhourly, aes(x=names, group=category)) +
             geom_histogram(aes(y=after_stat(count), fill=category), position = position_stack(reverse = TRUE), stat="count", lwd=0.5, col="black")+
             labs(x = "Sensors", y = "Count") +
@@ -1101,12 +1100,12 @@ server <- function(input, output, session) {
             theme_minimal()+
             scale_fill_discrete(type=EPAcols)+
             theme(axis.text.x = element_text(angle = 75, hjust=1))
-
+        
         ggplotly(plot)
-
+        
     })
-
-
+    
+    
     output$underMap <- renderPlotly({
         req(input$file1)
         
@@ -1121,8 +1120,8 @@ server <- function(input, output, session) {
         #sg.cityPoints <- ggplot2::fortify(sg.city, region = "id")
         # merge the "fortified" data with the data from our spatial object
         #sg.cityDF <- left_join(sg.cityPoints, sg.city@data, by = "id")
-
-
+        
+        
         k <- ggplot(readings_underCT, aes(longitude, latitude)) +
             geom_path(data = sg.city, aes(long, lat, group=id), color='black')+
             geom_point(aes(size= count/total_readings, color=count/total_readings)) +
@@ -1133,22 +1132,22 @@ server <- function(input, output, session) {
             ggtitle("Readings Under Median by Sensor")+
             geom_text(aes(label=names), check_overlap = F, show.legend = F, size = 3, vjust = 2)+
             theme_minimal()
-
-
+        
+        
         ggplotly(k)
         
-
-
+        
+        
     })
-
-
+    
+    
     output$underPlot <- renderPlotly({
         req(input$file1)
-
+        
         readings_underCT <- readingsUnder()
-
+        
         pct_diffCols <- c("0-15%"="#EDF8FB", "15%-50%"="#B3CDE3","50%-100%" = "#8C96C6", "200% or more"="#88419D","total readings"="#80808050")
-
+        
         plot <- ggplot(readings_underCT, aes(x=names)) +
             geom_col(aes(y=total_readings, fill= "total readings"), col=1) +
             geom_col(aes(y=`0-15%`, fill="0-15%"), col=1) +
@@ -1161,14 +1160,14 @@ server <- function(input, output, session) {
             scale_colour_manual(name="Values",values=pct_diffCols, guide = guide_legend(override.aes=aes(fill=NA)) ) +
             scale_fill_manual(name="Values",values=pct_diffCols) +
             theme(axis.text.x = element_text(angle = 75, hjust=1))
-
+        
         ggplotly(plot)
     })
-
-
+    
+    
     output$overMap <- renderPlotly({
         req(input$file1)
-
+        
         readings_overCT <- readingsOver()
         readings_overCT <- filter(readings_overCT, total_readings != 0)
         
@@ -1180,8 +1179,8 @@ server <- function(input, output, session) {
         #sg.cityPoints <- ggplot2::fortify(sg.city, region = "id")
         # merge the "fortified" data with the data from our spatial object
         #sg.cityDF <- left_join(sg.cityPoints, sg.city@data, by = "id")
-
-
+        
+        
         k <- ggplot(readings_overCT, aes(longitude, latitude)) +
             geom_path(data = sg.city, aes(long, lat, group=id), color='black')+
             geom_point(aes(size= count/total_readings, color=count/total_readings)) +
@@ -1192,20 +1191,20 @@ server <- function(input, output, session) {
             ggtitle("Readings Over Median by Sensor")+
             geom_text(aes(label=names), check_overlap = F, show.legend = F, size = 3, vjust = 2)+
             theme_minimal()
-
+        
         ggplotly(k)
-
-
-
+        
+        
+        
     })
-
+    
     output$overPlot <- renderPlotly({
         req(input$file1)
-
+        
         readings_overCT <- readingsOver()
-
+        
         pct_diffCols <- c("0-15%"="#FEEDDE", "15%-50%"="#FDBE85","50%-100%" = "#FD8D3C", "200% or more"="#E6550D","total readings"="#80808050")
-
+        
         plot <- ggplot(readings_overCT, aes(x=names)) +
             geom_col(aes(y=total_readings, fill= "total readings"), col=1) +
             geom_col(aes(y=`0-15%`, fill="0-15%"), col=1) +
@@ -1218,15 +1217,15 @@ server <- function(input, output, session) {
             scale_colour_manual(name="Values",values=pct_diffCols, guide = guide_legend(override.aes=aes(fill=NA)) ) +
             scale_fill_manual(name="Values",values=pct_diffCols) +
             theme(axis.text.x = element_text(angle = 75, hjust=1))
-
+        
         ggplotly(plot)
     })
-
-
+    
+    
     output$downDays <- renderPlotly({
         req(input$file1)
         downSensors <- downSensors()
-
+        
         down <- ggplot(downSensors, aes(y=numDownDays))+
             geom_col(aes(x= names, y=numDownDays), lwd=1)+
             labs(x = "Sensors", y = "Number of Days") +
@@ -1236,184 +1235,185 @@ server <- function(input, output, session) {
             scale_fill_brewer(palette="RdYlBu")+
             theme_minimal()+
             theme(axis.text.x = element_text(angle = 45, hjust=1))
-
+        
         ggplotly(down)
-
+        
     })
-
+    
+    
     output$percentagesG <-renderText({
         req(input$file1)
         PAhourly <- PAhourly()
-
+        
         x<-PAhourly %>% dplyr::count(category)
-
+        
         if(length(x[x$category == "Good",2])==0){
             q <- "0 %"
         }
         else if(x[x$category == "Good",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Good",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Good",2]/sum(x[,2])*100, 2),"%")}
         q
     })
-
+    
     output$percentagesM <-renderText({
         req(input$file1)
         PAhourly <- PAhourly()
         x<-PAhourly %>% dplyr::count(category)
-
+        
         if(length(x[x$category == "Moderate",2])==0){
             q <- "0 %"
         }
         else if(x[x$category == "Moderate",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Moderate",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Moderate",2]/sum(x[,2])*100, 2),"%")}
         q
     })
-
+    
     output$percentagesUSG <-renderText({
         req(input$file1)
         PAhourly <- PAhourly()
-
+        
         x<-PAhourly %>% dplyr::count(category)
         if(length(x[x$category == "Unhealthy for Sensitive Groups",2])==0){
             q <- "0 %"
         }
         else if(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])*100, 2),"%")}
         q
     })
-
+    
     output$percentagesU <-renderText({
         req(input$file1)
         PAhourly <- PAhourly()
-
+        
         x<-PAhourly %>% dplyr::count(category)
         if(length(x[x$category == "Unhealthy",2])==0){
             q <- "0 %"
         }
         else if(x[x$category == "Unhealthy",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Unhealthy",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Unhealthy",2]/sum(x[,2])*100, 2),"%")}
         q
     })
-
+    
     output$percentagesVU <-renderText({
         req(input$file1)
         PAhourly <- PAhourly()
-
+        
         x<-PAhourly %>% dplyr::count(category)
-
+        
         if(length(x[x$category == "Very Unhealthy",2])==0){
             q <- "0 %"
         }
         else if(x[x$category == "Very Unhealthy",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2])*100, 2),"%")}
         q
     })
-
+    
     output$percentagesH <-renderText({
         req(input$file1)
         PAhourly <- PAhourly()
-
+        
         x<-PAhourly %>% dplyr::count(category)
         if(length(x[x$category == "Hazardous",2])==0){
             q <- "0.0 %"
         }
         else if(x[x$category == "Hazardous",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2]), 2)*100,"%")}
         q
     })
-
+    
     output$percentiles1 <- renderText({
         req(input$file1)
-
+        
         avgSG <- summarySG()
-
+        
         percentiles <- quantile(avgSG$average_PM2.5, probs = c(0.25,0.33,0.5,0.66,0.75,0.95))
-
+        
         x <- paste(percentiles[1], "μg/m3", sep = " ")
         x
     })
-
+    
     output$percentiles2 <- renderText({
         req(input$file1)
-
+        
         avgSG <- summarySG()
-
+        
         percentiles <- quantile(avgSG$average_PM2.5, probs = c(0.25,0.33,0.5,0.66,0.75,0.95))
-
+        
         x <- paste(percentiles[2], "μg/m3", sep = " ")
         x
     })
-
+    
     output$percentiles3 <- renderText({
         req(input$file1)
-
+        
         avgSG <- summarySG()
-
+        
         percentiles <- quantile(avgSG$average_PM2.5, probs = c(0.25,0.33,0.5,0.66,0.75,0.95))
-
+        
         x <- paste(percentiles[3], "μg/m3", sep = " ")
         x
     })
-
+    
     output$percentiles4 <- renderText({
         req(input$file1)
-
+        
         avgSG <- summarySG()
-
+        
         percentiles <- quantile(avgSG$average_PM2.5, probs = c(0.25,0.33,0.5,0.66,0.75,0.95))
-
+        
         x <- paste(percentiles[4], "μg/m3", sep = " ")
         x
     })
-
+    
     output$percentiles5 <- renderText({
         req(input$file1)
-
+        
         avgSG <- summarySG()
-
+        
         percentiles <- quantile(avgSG$average_PM2.5, probs = c(0.25,0.33,0.5,0.66,0.75,0.95))
-
+        
         x <- paste(percentiles[5], "μg/m3", sep = " ")
         x
     })
-
+    
     output$percentiles6 <- renderText({
         req(input$file1)
-
+        
         avgSG <- summarySG()
-
+        
         percentiles <- quantile(avgSG$average_PM2.5, probs = c(0.25,0.33,0.5,0.66,0.75,0.95))
-
+        
         x <- paste(percentiles[6], "μg/m3", sep = " ")
         x
     })
     
-
-
+    
+    
     output$secondMax <- renderText({
         req(input$file1)
-
+        
         avgSG <- summarySG()
-
+        
         twenty4HRmeans <- zoo::rollmean(avgSG$average_PM2.5, k=24)
         secondMax <- max(twenty4HRmeans[-max(twenty4HRmeans)])
-
+        
         x <- paste(secondMax, "μg/m3", sep = " ")
         x
     })
-
-
+    
+    
     output$avgStats1 <- renderText({
         req(input$file1)
         req(input$dates1)
@@ -1430,8 +1430,8 @@ server <- function(input, output, session) {
                             sep="\n")
         output
     })
-
-
+    
+    
     output$avgStats2 <- renderText({
         req(input$file1)
         req(input$dates1)
@@ -1448,15 +1448,15 @@ server <- function(input, output, session) {
                             sep="\n")
         output
     })
-
-
+    
+    
     output$catsPlot <- renderPlotly({
         req(input$file1)
-
+        
         PAhourly <- PAhourly()
-
+        
         EPAcols <- c("Good"="#00e400", "Moderate"="#ffff00","Unhealthy for Sensitive Groups" = "#ff7e00", "Unhealthy" = "#ff0000", "Very Unhealthy" = "#8f3f97", "Hazardous+" = "#7e0023")
-
+        
         cats<- ggplot(PAhourly, aes(x=category)) +
             geom_histogram(aes(y=after_stat(count), fill=category), position = position_stack(reverse = TRUE), stat="count", lwd=0.5, col="black")+
             labs(x = "Sensors", y = "Count") +
@@ -1464,25 +1464,25 @@ server <- function(input, output, session) {
             theme_minimal()+
             scale_fill_discrete(type=EPAcols)+
             theme(axis.text.x = element_text(angle = 75, hjust=1))
-
+        
         ggplotly(cats)
-
+        
     })
-
+    
     # Filter data based on selections
     output$sensorsTable <- DT::renderDataTable(DT::datatable({
         req(input$file1)
-
+        
         sensorsList()
     }))
-
+    
     output$contents <- DT::renderDataTable(DT::datatable({
         req(input$file1)
         
         PAhourly()
     }))
-        
-
+    
+    
     output$ttests <- renderText({
         req(input$file1)
         req(input$file2)
@@ -1491,14 +1491,14 @@ server <- function(input, output, session) {
         result <- PurpleAirCEHAT::ttests(matchingDays$otherCityPM,matchingDays$southGatePM,nameOfCity)
         return(result)
     })
-
+    
     output$highlowSensor <- renderPlotly({
         req(input$file1)
-
+        
         PAhi_lo <- PAhi_lo()
-
+        
         wessy_pal <- c("high"="#C93312","low"="#899DA4")
-
+        
         hilo <- ggplot(data=PAhi_lo[PAhi_lo$names == input$sensor,], aes(x=date, y=PM2.5, group = date)) +
             geom_line(lwd=1)+
             geom_point(data=PAhi_lo[PAhi_lo$type == "high"  & PAhi_lo$names == input$sensor, ],
@@ -1510,24 +1510,24 @@ server <- function(input, output, session) {
             scale_fill_manual(name="Type",values=wessy_pal) +
             ggtitle(input$sensor) +
             theme_minimal()
-
+        
         ggplotly(hilo)
     })
-
+    
     output$hiloHist <- renderPlot({
         req(input$file1)
         PAhi_lo <- PAhi_lo()
-
+        
         mean <- mean(PAhi_lo$PM2.5[PAhi_lo$names==input$sensor & PAhi_lo$type == "high"])
         std <- sqrt(var(PAhi_lo$PM2.5[PAhi_lo$names==input$sensor & PAhi_lo$type == "high"]))
-
+        
         hist(PAhi_lo$PM2.5[PAhi_lo$names==input$sensor & PAhi_lo$type == "high"], probability = TRUE, breaks = as.numeric(input$n_breaks),
              xlab = "PM2.5 (μg/m3)", main = "Histogram of High Values")
-
+        
         curve(dnorm(x, mean=mean, sd=std), col="darkblue", lwd=2, add=TRUE) #fits a normal curve to observe normaility in the distribution
     })
-
-
+    
+    
     output$percentDiff <- renderPlot({
         req(input$file1)
         PAfull <- newPAfull()
@@ -1537,15 +1537,15 @@ server <- function(input, output, session) {
         }
         else{plot.new()}
     })
-
-
+    
+    
     output$density <- renderPlotly({
         req(input$file1)
-
+        
         PAhi_lo <- PAhi_lo()
-
+        
         dates <- input$dates3
-
+        
         dens <- ggplot(PAhi_lo[PAhi_lo$type == "high" & lubridate::date(PAhi_lo$timestamp) >= toString(dates[1]) & lubridate::date(PAhi_lo$timestamp) <= toString(dates[2]),], aes(x=hour, group = timeofday))+
             geom_histogram(aes(y=after_stat(count/nrow(PAhi_lo[PAhi_lo$type == "high",])), color=timeofday, fill=timeofday), alpha=0.7, stat="count", bins=4, lwd=1)+
             geom_density(alpha = 0.2, fill = "grey")+
@@ -1556,107 +1556,107 @@ server <- function(input, output, session) {
             theme_minimal()
         ggplotly(dens)
     })
-
-
-
-
+    
+    
+    
+    
     output$overThresholdSG <- renderPlotly({
         req(input$file1)
-
+        
         # finding the number of days in the data frame
         summarySG<- summarySG()
         numDays <- length(unique(lubridate::mday(summarySG$timestamp)))
-
+        
         # finding the days over EPA threshold
         overEPA <- overEPAthresholdSG()
         
-
+        
         if(length(overEPA$timestamp) > 0) {
             ourData <- PurpleAirCEHAT::overEPA_hist(overEPA,numDays)
             epahist <- ggplot(ourData, aes(x=day,y=freq)) +
                 geom_bar(position="dodge", stat="identity") +
                 ggtitle("Days over EPA threshold in South Gate")}
-
+        
         else{ 
             df <- data.frame()
             epahist <- ggplot(df) + geom_point() + ggtitle("Days over EPA threshold in South Gate") }
         
         ggplotly(epahist)
     })
-
-
-
+    
+    
+    
     output$compareBoxplot<- renderPlotly({
         req(input$file1)
         req(input$file2)
-
+        
         matchingDays <- matchingDays()
-
+        
         nameOfCity <- PurpleAirCEHAT::gettingCityName(read.csv(input$file2$datapath))
-
+        
         boxplot <- ggplot(PurpleAirCEHAT::compareDataDF(matchingDays,nameOfCity), aes(x= city, y=PM2.5)) +
             geom_boxplot(outlier.colour="red", outlier.size = 8, fill=c("darkolivegreen3","darksalmon"),notch=T) +
             ggtitle(paste("PM2.5 in",nameOfCity,"vs South Gate",sep=" "))
-
+        
         ggplotly(boxplot)
     })
-
+    
     output$compareBar <- renderPlotly({
         req(input$file1)
         req(input$file2)
-
+        
         matchingDays <- matchingDays()
-
+        
         nameOfCity <- PurpleAirCEHAT::gettingCityName(read.csv(input$file2$datapath))
-
+        
         stacked <- ggplot(PurpleAirCEHAT::compareDataDF(matchingDays,nameOfCity), aes(fill=city, y=PM2.5, x=day)) +
             geom_bar(position="dodge", stat="identity") +
             geom_col(width = 0.7, position = position_dodge(0.9)) +
             ggtitle("Bar Chart of PM2.5 Readings")
-
+        
         ggplotly(stacked)
     })
-
+    
     output$avgs1 <- renderPlot({
         req(input$file1)
         req(input$dates1)
         avgSG <- summarySG()
-
+        
         #saves the start and end dates as a single vector, with start at index 1 and end at 2
         dates <- c(input$dates1)
-
+        
         #set title of  plot
         Title <- paste("8 Hour Averages From", paste(as.character(input$dates1), collapse = " to "))
-
+        
         avgs <- zoo::rollmean(avgSG$average_PM2.5[lubridate::date(avgSG$timestamp) >= toString(dates[1]) & lubridate::date(avgSG$timestamp) <= toString(dates[2])], k=8)
         plot(avgs,type="l", main= Title, xlab = "Time", ylab = "PM2.5 (μg/m3)")
     })
-
+    
     output$avgs2 <- renderPlot({
         req(input$file1)
-
+        
         avgSG <- summarySG()
-
+        
         #saves the start and end dates as a single vector, with start at index 1 and end at 2
         dates <- c(input$dates2)
-
+        
         #set title of  plot
         Title <- paste("8 Hour Averages From", paste(as.character(input$dates2), collapse = " to "))
-
+        
         avgs <- zoo::rollmean(avgSG$average_PM2.5[lubridate::date(avgSG$timestamp) >= toString(dates[1]) & lubridate::date(avgSG$timestamp) <= toString(dates[2])], k=8)
         plot(avgs,type="l",main=Title, xlab = "Time", ylab = "PM2.5 (μg/m3)")
     })
-
+    
     output$prediction <- renderPlotly({
         req(input$date1)
-
+        
         PAhourly <- PAhourly() %>% dplyr::filter(PAhourly()$timestamp == as_datetime(input$date1)+ lubridate::hours(input$hour))
-
+        
         if(length(input$sensorSel) >= 5){
             autoDF <- data.frame(PurpleAirCEHAT::krigePA(PAhourly, as_datetime(input$date1)+ lubridate::hours(input$hour)))
-
+            
             names(autoDF)[3] <- "predicted"
-
+            
             autoPlot <- ggplot() + geom_tile(autoDF, mapping = aes(x,y,fill=predicted), alpha=0.90) +
                 geom_point(PAhourly[,c('PM2.5',"longitude","latitude")], color ="black", size=2, pch=21, mapping = aes(longitude, latitude, fill=PM2.5), inherit.aes = TRUE) +
                 coord_equal() +
@@ -1664,25 +1664,25 @@ server <- function(input, output, session) {
                 labs(x = "longitude", y="latitude")+
                 theme_bw() +
                 ggtitle("Ordinary Kriging PM2.5 Predictions")
-
+            
             ggplotly(autoPlot)
         }
         else{
             stop("You must select at least 5 sensors for interpolation. Selecting as many as possible is recommended for stronger calculations.")
         }
-
+        
     })
-
+    
     output$variance <- renderPlotly({
         req(input$date1)
-
+        
         PAhourly <- PAhourly() %>% dplyr::filter(PAhourly()$timestamp == as_datetime(input$date1)+ lubridate::hours(input$hour))
-
+        
         if(length(input$sensorSel) >= 5){
             autoDF <- data.frame(PurpleAirCEHAT::krigePA(PAhourly, as_datetime(input$date1)+ lubridate::hours(input$hour)))
-
+            
             names(autoDF)[4] <- "variance"
-
+            
             autoVars <- ggplot() + geom_tile(autoDF, mapping = aes(x,y,fill=variance), alpha=0.90) +
                 geom_point(PAhourly[,c('PM2.5',"longitude","latitude")], color ="black", size=2, pch=21, mapping =aes(longitude, latitude, fill=PM2.5), inherit.aes = TRUE) +
                 coord_equal() +
@@ -1690,26 +1690,26 @@ server <- function(input, output, session) {
                 labs(x = "longitude", y="latitude")+
                 theme_bw() +
                 ggtitle("Ordinary Kriging PM2.5 Variance")
-
+            
             ggplotly(autoVars)
         }
-
+        
         else{
             stop("You must select at least 5 sensors for interpolation. Selecting as many as possible is recommended for stronger calculations.")
         }
-
+        
     })
-
+    
     output$stdev <- renderPlotly({
         req(input$date1)
-
+        
         PAhourly <- PAhourly() %>% dplyr::filter(PAhourly()$timestamp == as_datetime(input$date1)+ lubridate::hours(input$hour))
-
+        
         if(length(input$sensorSel) >= 5){
             autoDF <- data.frame(PurpleAirCEHAT::krigePA(PAhourly, as_datetime(input$date1)+ lubridate::hours(input$hour)))
-
+            
             names(autoDF)[5] <- "standard deviation"
-
+            
             autoStDev <- ggplot() + geom_tile(autoDF, mapping = aes(x,y,fill=`standard deviation`), alpha=0.90) +
                 geom_point(PAhourly[,c('PM2.5',"longitude","latitude")], color ="black", size=2, pch=21 , mapping =aes(longitude, latitude, fill=PM2.5), inherit.aes = TRUE) +
                 coord_equal() +
@@ -1717,13 +1717,13 @@ server <- function(input, output, session) {
                 labs(x = "longitude", y="latitude")+
                 theme_bw() +
                 ggtitle("Ordinary Kriging PM2.5 Standard Deviation")
-
+            
             ggplotly(autoStDev)
         }
         else{
             stop("You must select at least 5 sensors for interpolation. Selecting as many as possible is recommended for stronger calculations.")
         }
-
+        
     })
     
     output$schools <- renderPlotly({
@@ -1733,7 +1733,7 @@ server <- function(input, output, session) {
         
         sensitiveLocations <- PurpleAirCEHAT::sensitiveLocations(PAhourly,as_datetime(input$date1)+ lubridate::hours(input$hour))
         schools <- filter(sensitiveLocations, endsWith(places,"School") )
-
+        
         sg.city <- PurpleAirCEHAT::southgate()
         
         
@@ -1759,7 +1759,7 @@ server <- function(input, output, session) {
         
         sensitiveLocations <- PurpleAirCEHAT::sensitiveLocations(PAhourly,as_datetime(input$date1)+ lubridate::hours(input$hour))
         centers <- filter(sensitiveLocations, endsWith(places,"Park") | endsWith(places,"Center") )
-       
+        
         sg.city <- PurpleAirCEHAT::southgate()
         
         
@@ -1811,7 +1811,7 @@ server <- function(input, output, session) {
         
         sensitiveLocations <- PurpleAirCEHAT::sensitiveLocations(PAhourly,as_datetime(input$date1)+ lubridate::hours(input$hour))
         seniorCenters <- filter(sensitiveLocations, endsWith(places,"SC"))
-
+        
         sg.city <- PurpleAirCEHAT::southgate()
         
         
@@ -1831,12 +1831,12 @@ server <- function(input, output, session) {
     })
     
     output$downloadPAhourly <- downloadHandler(
-
+        
         filename = function() {
             req(input$file1)
-
+            
             dates <- c(as.character(format(as.Date(min(PAhourly()$timestamp))),"yyyy-mm-dd"), as.character(format(as.Date(max(PAhourly()$timestamp))),"yyyy-mm-dd"))
-
+            
             output <- paste("hourlyPA_", paste(dates, collapse = "_to_"), ".csv", sep = "")
             output
         },
@@ -1844,8 +1844,8 @@ server <- function(input, output, session) {
             write.csv(PAhourly(), file, row.names = FALSE)
         }
     )
-
-
+    
+    
     output$downloadavgSG <- downloadHandler(
         
         filename = function() {
@@ -1861,7 +1861,7 @@ server <- function(input, output, session) {
         }
     )
     
-
+    
     output$Report <- downloadHandler(
         filename = function() {
             paste('report', sep = '.', switch(
@@ -1885,17 +1885,17 @@ server <- function(input, output, session) {
                            d3 = input$date3,
                            d4 = input$date4,
                            daily = dailySG(),
-                           file2 = input$file2,
                            dts1 = input$dates1,
                            dts2 = input$dates2,
                            dts3 = input$dates3,
                            dts4 = input$dates4,
                            down = downSensors(),
+                           file2 = input$file2,
                            highlow = PAhi_lo(),
                            hour = input$hour,
-                           matching = matchingDays(),
+                           #matching = matchingDays(),
                            over = readingsOver(),
-                           #overEPA = overThresholdSG(),
+                           #overEPA = overEPAThresholdSG(),
                            PAfull = newPAfull(),
                            PAhourly = PAhourly(),
                            sensor = input$sensor,
@@ -1903,27 +1903,27 @@ server <- function(input, output, session) {
                            summary = summarySG(),
                            under = readingsUnder() )
             
-
+            
             out <- rmarkdown::render('report.Rmd', params = params, switch( input$format,
-                PDF = pdf_document(), Word = word_document()), envir = new.env(parent = globalenv()))
+                                                                            PDF = pdf_document(), Word = word_document()), envir = new.env(parent = globalenv()))
             file.rename(out, file)
         }
     )
-
-
+    
+    
     # handling deployment errors
     
     test_that("error handler with unwrapped 0-param R function does throw an error", {
-
+        
         expect_error(
             tryCatchLog(
                 stop("an error occured"),
                 error = geterrmessage    # has no parameter (at least in R version 3.4.2 :-)
             ),
             "unused argument (cond)", fixed = TRUE)    # Error in value[[3L]](cond) : unused argument (FALSE)
-
+        
     })
-
+    
     options(warning.expression =
                 quote({
                     if(exists("last.warning",baseenv()) && !is.null(last.warning)){
@@ -1942,7 +1942,7 @@ server <- function(input, output, session) {
         
         pat
     }
-
+    
 } #--server
 
 

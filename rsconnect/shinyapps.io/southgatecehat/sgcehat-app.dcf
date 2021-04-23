@@ -1,0 +1,12 @@
+name: sgcehat-app
+title: sgcehat-app
+username:
+account: southgatecehat
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4017594
+bundleId: 4508423
+url: https://southgatecehat.shinyapps.io/sgcehat-app/
+when: 1619160950.33387
+asMultiple: FALSE
+asStatic: FALSE
