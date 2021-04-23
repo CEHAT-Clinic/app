@@ -14,6 +14,7 @@ library(zoo)
 library(gridExtra)
 library(PurpleAirCEHAT)
 library(markdown)
+library(rmarkdown)
 library(lubridate)
 library(shinythemes)
 library(testthat)
@@ -73,8 +74,8 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          p("The report can only be uploaded with datasets that have been generated, so make sure to go to each page to ensure every plot is loaded."),
                                          br(),
                                          radioButtons('format', strong('Document format'), c('PDF', 'Word')),
-                                        # downloadButton("report", "Create report"),
-                                         downloadButton('downloadReport', "Generate Report")
+                                        downloadButton("Report", "Create report"),
+                                         #downloadButton('Report', "Generate Report")
 
 
                                 ),
@@ -118,6 +119,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              p("To download this data, click the", strong("Download General South Gate Air Quality Data"), "button below"),
                                              br(),
                                              downloadButton("downloadavgSG", "Download General South Gate Air Quality Data"),
+                                             br(),
                                              br(),
                                              
                                              p("The chart below depicts the general", em("hourly"), "PM2.5 air quality in South Gate
@@ -185,6 +187,8 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              #Output: Data file ----
                                              DT::dataTableOutput("contents"),
                                              downloadButton(outputId = "downloadPAhourly", "Download Hourly Sensor Data"),
+                                             br(),
+                                             br(),
 
                                              h2("Diurnal Patterns"),
                                              p("In this section you can explore the diurnal (day-night cycle) patterns. For the three 
@@ -1846,7 +1850,7 @@ server <- function(input, output, session) {
         }
     )
 
-    output$downloadReport <- downloadHandler(
+    output$Report <- downloadHandler(
         filename = function() {
             paste('my-report', sep = '.', switch(
                 input$format, PDF = 'pdf', Word = 'docx'
