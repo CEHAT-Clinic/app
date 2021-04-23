@@ -21,7 +21,8 @@ library(testthat)
 library(tryCatchLog)
 library(futile.logger)
 
-#sensors <- hourlyPA(cleanPA(read.csv("december2020_readings.csv")),FALSE)
+pat <- Sys.getenv('GITHUB_PAT')
+
 #set the max file size to be 1000 Mb
 options(shiny.maxRequestSize = 10000*1024^2)
 
@@ -43,7 +44,8 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          h2("Introduction"),
                                          p("Welcome to the South Gate CEHAT Data Analysis report"),
                                          br(),
-                                         p("First, select your", strong("PurpleAir csv file,"), "answer the question asked, then confirm which sensors you wish to include"),
+                                         p("First, select your", strong("PurpleAir csv file,"), 
+                                           "answer the question asked, then confirm which sensors you wish to include"),
                                          br(),
 
                                          # Input: Select a file ---- PurpleAir
@@ -56,6 +58,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          radioButtons("answer", label = "Was this data downloaded after March 30, 2021?",
                                                       choices = list("Yes" = "Y", "No" = "N")),
                                          br(),
+                                         p(strong("Make sure that your response to the question above is correct, otherwise you will get an error.")),
                                          br(),
                                          p(strong("Confirm which sensors you'd like to include.")),
                                          panel( uiOutput("sensorSel"),
@@ -170,7 +173,8 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                above that threshold to be unsafe. The bar chart below displays the number of PM2.5 readings in 
                                                South Gate that surpass this 24-hour standard for each day in the observed time frame of the dataset. 
                                                The graph is interactive, so hovering over a bar will display the specified day and the number of 
-                                               readings that exceeded the EPA threshold that day."),
+                                               readings that exceeded the EPA threshold that day. Note that if the plot is blank, it means that 
+                                               there were no readings over the EPA threshold for that time period."),
 
                                              plotlyOutput(outputId = "overThresholdSG"),
                                              br(),
@@ -349,8 +353,6 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
                                              br(),
                                              br(),
-                                             br(),
-                                             br()
 
 
                                          )
@@ -366,9 +368,9 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                          h2("The Data"),
                                          p("We are specifically comparing the South Gate data against AQMD data. To find datasets that you can use, visit the",
                                            a("AB 617 Community Air Monitoring website.",
-                                             href = "http://xappprod.aqmd.gov/AB617CommunityAirMonitoring/"), "Also, keep in mind that in order for this page to 
-                                           populate with plots, the days in the AQMD data and in the PurpleAir data must overlap. So,for example, you can not upload PurpleAir data
-                                           from December and AQMD from April. "),
+                                             href = "http://xappprod.aqmd.gov/AB617CommunityAirMonitoring/"), strong("Also, keep in mind that in order for this page to 
+                                           populate with plots, the days in the AQMD data and in the PurpleAir data must overlap. So, for example, you can not upload PurpleAir data
+                                           from December and AQMD from April.")),
                                          
 
                                          #strong("Upload your", em("AQMD csv file"), "here:"),
@@ -423,7 +425,9 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                so that you can hover over the map and observe prediction, variance, or 
                                                standard deviation values at a specific longitude and latitude. To learn 
                                                about how kriging interpolation works, visit", a("this webpage",
-                                             href = "https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation")),
+                                             href = "https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation"), 
+                                             strong("If you move the slider to a time before the first timestamp recording in the dataset, the interpolation page
+                                                    will not populate. You will get the following error: 'cannot derive coordinates from non-numeric matrix.'")),
                                              
                                              plotlyOutput("prediction"),
                                              
@@ -435,7 +439,6 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              br(),
 
                                              plotlyOutput("stdev"),
-                                             
 
                                              br(),
                                              
@@ -1106,17 +1109,18 @@ server <- function(input, output, session) {
 
     output$underMap <- renderPlotly({
         req(input$file1)
-
+        
         readings_underCT <- readingsUnder()
-
+        readings_underCT <- filter(readings_underCT, total_readings != 0)
+        
         sg.city <- PurpleAirCEHAT::southgate()
         #coverting the city into a data frame to work with ggplot
         # add to data a new column termed "id" composed of the rownames of data
-        sg.city@data$id <- rownames(sg.city@data)
+        #sg.city@data$id <- rownames(sg.city@data)
         # create a data.frame from our spatial object
-        sg.cityPoints <- ggplot2::fortify(sg.city, region = "id")
+        #sg.cityPoints <- ggplot2::fortify(sg.city, region = "id")
         # merge the "fortified" data with the data from our spatial object
-        sg.cityDF <- left_join(sg.cityPoints, sg.city@data, by = "id")
+        #sg.cityDF <- left_join(sg.cityPoints, sg.city@data, by = "id")
 
 
         k <- ggplot(readings_underCT, aes(longitude, latitude)) +
@@ -1132,7 +1136,7 @@ server <- function(input, output, session) {
 
 
         ggplotly(k)
-
+        
 
 
     })
@@ -1166,15 +1170,16 @@ server <- function(input, output, session) {
         req(input$file1)
 
         readings_overCT <- readingsOver()
-
+        readings_overCT <- filter(readings_overCT, total_readings != 0)
+        
         sg.city <- PurpleAirCEHAT::southgate()
         #coverting the city into a data frame to work with ggplot
         # add to data a new column termed "id" composed of the rownames of data
-        sg.city@data$id <- rownames(sg.city@data)
+        #sg.city@data$id <- rownames(sg.city@data)
         # create a data.frame from our spatial object
-        sg.cityPoints <- ggplot2::fortify(sg.city, region = "id")
+        #sg.cityPoints <- ggplot2::fortify(sg.city, region = "id")
         # merge the "fortified" data with the data from our spatial object
-        sg.cityDF <- left_join(sg.cityPoints, sg.city@data, by = "id")
+        #sg.cityDF <- left_join(sg.cityPoints, sg.city@data, by = "id")
 
 
         k <- ggplot(readings_overCT, aes(longitude, latitude)) +
@@ -1527,10 +1532,10 @@ server <- function(input, output, session) {
         req(input$file1)
         PAfull <- newPAfull()
         if(input$answer == "Y"){
-            title <- paste("Historical Percent Difference for", input$sensor, sep=" ")
+            title <- paste("Mean Percent Difference for", input$sensor, sep=" ")
             plot(x=PAfull$timestamp[PAfull$names==input$sensor], y=PAfull$percent.diff[PAfull$names==input$sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")
         }
-        else{return(NULL)}
+        else{plot.new()}
     })
 
 
@@ -1573,7 +1578,8 @@ server <- function(input, output, session) {
                 ggtitle("Days over EPA threshold in South Gate")}
 
         else{ 
-            stop("No days are over the EPA threshold for this month.") }
+            df <- data.frame()
+            epahist <- ggplot(df) + geom_point() + ggtitle("Days over EPA threshold in South Gate") }
         
         ggplotly(epahist)
     })
@@ -1904,7 +1910,8 @@ server <- function(input, output, session) {
     )
 
 
-
+    # handling deployment errors
+    
     test_that("error handler with unwrapped 0-param R function does throw an error", {
 
         expect_error(
@@ -1924,6 +1931,16 @@ server <- function(input, output, session) {
                         cat("Warning message:\n",txt,'\n',sep = "")
                     }
                 }))
+    
+    github_pat <- function() {
+        pat <- Sys.getenv('GITHUB_PAT')
+        if (identical(pat, "")) {
+            stop("Please set env var GITHUB_PAT to your github personal access token",
+                 call. = FALSE)
+        }
+        
+        pat
+    }
 
 } #--server
 
