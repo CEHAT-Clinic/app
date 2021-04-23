@@ -70,7 +70,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
                                          br(),
                                          p("After creating the desired plots, download this report as a pdf or a word document by clicking the", strong(em("Generate Report")), "button below."),
-                                         p("To create a static (uneditable) report select the word document option. Otherwise, leave the format set to pdf."),
+                                         p("To create an editable report, select the 'Word Document' option. Otherwise, leave the format set to PDF."),
                                          p("The report can only be uploaded with datasets that have been generated, so make sure to go to each page to ensure every plot is loaded."),
                                          br(),
                                          radioButtons('format', strong('Document format'), c('PDF', 'Word')),
@@ -183,6 +183,11 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              fluidRow(
                                                  splitLayout(cellWidths = c("50%", "50%"), plotOutput(outputId = "avgs1"), plotOutput(outputId = "avgs2"))
                                              ),
+                                             fluidRow(
+                                                 splitLayout(cellWidths = c("50%", "50%"), verbatimTextOutput(outputId = "avgStats1"), verbatimTextOutput(outputId = "avgStats2"))
+                                             ), 
+                                             br(),
+                                             br(),
                                              
                                              #Output: Data file ----
                                              DT::dataTableOutput("contents"),
@@ -1618,7 +1623,7 @@ server <- function(input, output, session) {
         Title <- paste("8 Hour Averages From", paste(as.character(input$dates1), collapse = " to "))
 
         avgs <- zoo::rollmean(avgSG$average_PM2.5[lubridate::date(avgSG$timestamp) >= toString(dates[1]) & lubridate::date(avgSG$timestamp) <= toString(dates[2])], k=8)
-        plot(avgs,type="l", main= Title)
+        plot(avgs,type="l", main= Title, xlab = "Time", ylab = "PM2.5 (μg/m3)")
     })
 
     output$avgs2 <- renderPlot({
@@ -1633,7 +1638,7 @@ server <- function(input, output, session) {
         Title <- paste("8 Hour Averages From", paste(as.character(input$dates2), collapse = " to "))
 
         avgs <- zoo::rollmean(avgSG$average_PM2.5[lubridate::date(avgSG$timestamp) >= toString(dates[1]) & lubridate::date(avgSG$timestamp) <= toString(dates[2])], k=8)
-        plot(avgs,type="l",main=Title)
+        plot(avgs,type="l",main=Title, xlab = "Time", ylab = "PM2.5 (μg/m3)")
     })
 
     output$prediction <- renderPlotly({
@@ -1849,10 +1854,11 @@ server <- function(input, output, session) {
             write.csv(summarySG(), file, row.names = FALSE)
         }
     )
+    
 
     output$Report <- downloadHandler(
         filename = function() {
-            paste('my-report', sep = '.', switch(
+            paste('report', sep = '.', switch(
                 input$format, PDF = 'pdf', Word = 'docx'
             ))
         },
@@ -1866,7 +1872,9 @@ server <- function(input, output, session) {
             on.exit(setwd(owd))
             file.copy(src, 'report.Rmd', overwrite = TRUE)
             
-            params <- list(d1 = input$date1,
+            params <- list(answer = input$answer,
+                           breaks = input$n_breaks,
+                           d1 = input$date1,
                            d2 = input$date2,
                            d3 = input$date3,
                            d4 = input$date4,
@@ -1881,6 +1889,7 @@ server <- function(input, output, session) {
                            #matching = matchingDays(),
                            over = readingsOver(),
                            #overEPA = overThresholdSG(),
+                           PAfull = newPAfull(),
                            PAhourly = PAhourly(),
                            sensor = input$sensor,
                            sensors = input$sensorSel,
@@ -1890,45 +1899,6 @@ server <- function(input, output, session) {
 
             out <- rmarkdown::render('report.Rmd', params = params, switch( input$format,
                 PDF = pdf_document(), Word = word_document()), envir = new.env(parent = globalenv()))
-            file.rename(out, file)
-        }
-    )
-    output$report <- downloadHandler(
-        filename = function() {
-            paste('report', sep = '.', switch(
-                input$format, PDF = 'pdf', Word = 'docx'))
-        },
-        
-        content = function(file) {
-            src <- normalizePath('report.Rmd')
-            
-            # temporarily switch to the temp dir, in case you do not have write
-            # permission to the current working directory
-            owd <- setwd(tempdir())
-            on.exit(setwd(owd))
-            file.copy(src, 'report.Rmd', overwrite = TRUE)
-            
-            params <- list(d1 = input$date1,
-                           d2 = input$date2,
-                           d3 = input$date3,
-                           daily = dailySG(),
-                           dts1 = input$dates1,
-                           dts2 = input$dates2,
-                           dts3 = input$dates3,
-                           dts4 = input$dates4,
-                           down = downSensors(),
-                           highlow = PAhi_lo(),
-                           hour = input$hour,
-                           over = readingsOver(),
-                           PAhourly = PAhourly(),
-                           sensor = input$sensor,
-                           sensors = input$sensorSel,
-                           summary = summarySG(),
-                           under = readingsUnder() )
-            
-            library(rmarkdown)
-            out <- render('report.Rmd', params = params, switch(
-                input$format, PDF = pdf_document(), Word = word_document() ), envir = new.env(parent = globalenv()))
             file.rename(out, file)
         }
     )
