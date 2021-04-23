@@ -329,7 +329,7 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                              br(),
                                              
                                              p("The plot below is a direct visualization of the mean percent difference field for a particular sensor. 
-                                               This can be used to obsreve how functional the specified sensor has been, and determine if any channels 
+                                               This can be used to observe how functional the specified sensor has been, and determine if any channels 
                                                have been downgraded."),
                                              br(),
                                              plotOutput("percentDiff"),
@@ -631,7 +631,7 @@ server <- function(input, output, session) {
         req(input$file1)
         
         sliderInput("hour", label = strong("Choose hour"), min = 0,
-                    max = 24, value = lubridate::hour(PAhourly()$timestamp[1]) )
+                    max = 23, value = lubridate::hour(PAhourly()$timestamp[1]) )
         
     })
     
@@ -1530,12 +1530,16 @@ server <- function(input, output, session) {
     
     output$percentDiff <- renderPlot({
         req(input$file1)
-        PAfull <- newPAfull()
+        req(input$answer)
+        
         if(input$answer == "Y"){
+            PAfull <- newPAfull()
             title <- paste("Mean Percent Difference for", input$sensor, sep=" ")
             plot(x=PAfull$timestamp[PAfull$names==input$sensor], y=PAfull$percent.diff[PAfull$names==input$sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")
         }
-        else{plot.new()}
+        else{
+            df <- as.data.frame(x=c(),percent.diff=c())
+            plot(df$x,df$percent.diff, xlim = c(0,10),ylim =c(0,100))}
     })
     
     
