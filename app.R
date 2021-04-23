@@ -72,11 +72,11 @@ ui <- fluidPage(theme = shinytheme("lumen"),
 
 
                                          br(),
-                                         p("After creating the desired plots, download this report as a pdf or a word document by clicking the", strong(em("Generate Report")), "button below."),
-                                         p("To create an editable report, select the 'Word Document' option. Otherwise, leave the format set to PDF."),
+                                         p("After creating the desired plots, download this report as a pdf or a word document by clicking the", strong(em("Create Report")), "button below."),
+                                         p("To create an static, uneditable report, select the 'PDF Document' option. Otherwise, leave the format set to Word"),
                                          p("The report can only be uploaded with datasets that have been generated, so make sure to go to each page to ensure every plot is loaded."),
                                          br(),
-                                         radioButtons('format', strong('Document format'), c('PDF', 'Word')),
+                                         radioButtons('format', strong('Document format'), c('Word','PDF')),
                                         downloadButton("Report", "Create report"),
                                          #downloadButton('Report', "Generate Report")
 
@@ -424,9 +424,9 @@ ui <- fluidPage(theme = shinytheme("lumen"),
                                                standard deviation of those predictions. Each of these plots are interactive
                                                so that you can hover over the map and observe prediction, variance, or 
                                                standard deviation values at a specific longitude and latitude. To learn 
-                                               about how kriging interpolation works, visit", a("this webpage",
+                                               about how kriging interpolation works, visit", a("this webpage.",
                                              href = "https://www.publichealth.columbia.edu/research/population-health-methods/kriging-interpolation"), 
-                                             strong("If you move the slider to a time before the first timestamp recording in the dataset, the interpolation page
+                                             strong("If you move the slider to a time before the first recorded timestamp in the dataset, the interpolation page
                                                     will not populate. You will get the following error: 'cannot derive coordinates from non-numeric matrix.'")),
                                              
                                              plotlyOutput("prediction"),
@@ -775,7 +775,6 @@ server <- function(input, output, session) {
     })
 
 
-
     overEPAthresholdSG <- reactive({
         req(input$file1)
 
@@ -1025,34 +1024,34 @@ server <- function(input, output, session) {
             g <- "0%"
         }
         else if(x[x$category == "Good",2]/sum(x[,2])<0.01){
-            g <- "less than 0.01%"
+            g <- "less than 1%"
         }
-        else{g<-paste(round(x[x$category == "Good",2]/sum(x[,2]), 2),"%")}
+        else{g<-paste(round(x[x$category == "Good",2]/sum(x[,2])*100, 2),"%")}
         
         
         if(length(x[x$category == "Moderate",2])==0){
             m <- "0%"
         }
         else if(x[x$category == "Moderate",2]/sum(x[,2])<0.01){
-            m <- "less than 0.01%"
+            m <- "less than 1%"
         }
-        else{m<-paste(round(x[x$category == "Moderate",2]/sum(x[,2]), 2),"%")}
+        else{m<-paste(round(x[x$category == "Moderate",2]/sum(x[,2])*100, 2),"%")}
         
     
         if(length(x[x$category == "Unhealthy for Sensitive Groups",2])==0){
             ufsg <- "0%"
         }
         else if(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])<0.01){
-            ufsg <- "less than 0.01%"
+            ufsg <- "less than 1%"
         }
-        else{ufsg<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2]), 2),"%")}
+        else{ufsg<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])*100, 2),"%")}
     
         
         if(length(x[x$category == "Unhealthy",2])==0){
             u <- "0%"
         }
         else if(x[x$category == "Unhealthy",2]/sum(x[,2])<0.01){
-            u <- "less than 0.01%"
+            u <- "less than 1%"
         }
         else{u<-paste(round(x[x$category == "Unhealthy",2]/sum(x[,2]), 2),"%")}
         
@@ -1061,18 +1060,18 @@ server <- function(input, output, session) {
             vu <- "0%"
         }
         else if(x[x$category == "Very Unhealthy",2]/sum(x[,2])<0.01){
-            vu <- "less than 0.01%"
+            vu <- "less than 1%"
         }
-        else{vu<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2]), 2),"%")}
+        else{vu<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2])*100, 2),"%")}
         
         
         if(length(x[x$category == "Hazardous",2])==0){
             h <- "0%"
         }
         else if(x[x$category == "Hazardous",2]/sum(x[,2])<0.01){
-            h <- "less than 0.01%"
+            h <- "less than 1%"
         }
-        else{h<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2]), 2),"%")}
+        else{h<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2])*100, 2),"%")}
         
         
         
@@ -1240,6 +1239,7 @@ server <- function(input, output, session) {
         ggplotly(down)
 
     })
+    
 
     output$percentagesG <-renderText({
         req(input$file1)
@@ -1251,9 +1251,9 @@ server <- function(input, output, session) {
             q <- "0 %"
         }
         else if(x[x$category == "Good",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Good",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Good",2]/sum(x[,2])*100, 2),"%")}
         q
     })
 
@@ -1266,9 +1266,9 @@ server <- function(input, output, session) {
             q <- "0 %"
         }
         else if(x[x$category == "Moderate",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Moderate",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Moderate",2]/sum(x[,2])*100, 2),"%")}
         q
     })
 
@@ -1281,9 +1281,9 @@ server <- function(input, output, session) {
             q <- "0 %"
         }
         else if(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Unhealthy for Sensitive Groups",2]/sum(x[,2])*100, 2),"%")}
         q
     })
 
@@ -1296,9 +1296,9 @@ server <- function(input, output, session) {
             q <- "0 %"
         }
         else if(x[x$category == "Unhealthy",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Unhealthy",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Unhealthy",2]/sum(x[,2])*100, 2),"%")}
         q
     })
 
@@ -1312,9 +1312,9 @@ server <- function(input, output, session) {
             q <- "0 %"
         }
         else if(x[x$category == "Very Unhealthy",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Very Unhealthy",2]/sum(x[,2])*100, 2),"%")}
         q
     })
 
@@ -1327,9 +1327,9 @@ server <- function(input, output, session) {
             q <- "0.0 %"
         }
         else if(x[x$category == "Hazardous",2]/sum(x[,2])<0.01){
-            q <- "< 0.01%"
+            q <- "< 1%"
         }
-        else{q<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2]), 2),"%")}
+        else{q<-paste(round(x[x$category == "Hazardous",2]/sum(x[,2]), 2)*100,"%")}
         q
     })
 
@@ -1890,11 +1890,12 @@ server <- function(input, output, session) {
                            dts3 = input$dates3,
                            dts4 = input$dates4,
                            down = downSensors(),
+                           file2 = input$file2,
                            highlow = PAhi_lo(),
                            hour = input$hour,
                            #matching = matchingDays(),
                            over = readingsOver(),
-                           #overEPA = overThresholdSG(),
+                           #overEPA = overEPAThresholdSG(),
                            PAfull = newPAfull(),
                            PAhourly = PAhourly(),
                            sensor = input$sensor,
