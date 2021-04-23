@@ -64,18 +64,7 @@ readings_underCT <- params$under
 readings_overCT <- params$over
 
 
-
-
 sg.city <- PurpleAirCEHAT::southgate()
-#coverting the city into a data frame to work with ggplot
-# add to data a new column termed "id" composed of the rownames of data
-sg.city@data$id <- rownames(sg.city@data)
-# create a data.frame from our spatial object
-sg.cityPoints <- ggplot2::fortify(sg.city, region = "id")
-# merge the "fortified" data with the data from our spatial object
-sg.cityDF <- left_join(sg.cityPoints, sg.city@data, by = "id")
-
-
 
 
 EPAcols <- c("Good"="#00e400", "Moderate"="#ffff00","Unhealthy for Sensitive Groups" = "#ff7e00", "Unhealthy" = "#ff0000", "Very Unhealthy" = "#8f3f97", "Hazardous" = "#7e0023")
