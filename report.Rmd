@@ -46,13 +46,13 @@ dates1 <- c(params$dts1)
 dates2 <- c(params$dts2)
 dates3 <- params$dts3
 dates4 <- params$dts4
-<<<<<<< HEAD
-matchingDays <- params$matching
-=======
 
 matchingDays <- params$matching
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
+
+matchingDays <- params$matching
+
+
 PAfull <- params$PAfull
 PAhourly <- params$PAhourly
 PAhi_lo <- params$highlow
@@ -73,11 +73,7 @@ sg.cityPoints <- ggplot2::fortify(sg.city, region = "id")
 sg.cityDF <- left_join(sg.cityPoints, sg.city@data, by = "id")
 EPAcols <- c("Good"="#00e400", "Moderate"="#ffff00","Unhealthy for Sensitive Groups" = "#ff7e00", "Unhealthy" = "#ff0000", "Very Unhealthy" = "#8f3f97", "Hazardous" = "#7e0023")
 wessy_pal <- c("high"="#C93312","low"="#899DA4")
-<<<<<<< HEAD
-=======
 
-
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 Krigehourly <- PAhourly %>% dplyr::filter(PAhourly$timestamp == as_datetime(date1)+ lubridate::hours(params$hour))
 
 autoDF <- data.frame(PurpleAirCEHAT::krigePA(Krigehourly, as_datetime(date1)+ lubridate::hours(params$hour)))
@@ -92,19 +88,18 @@ The following sections show the plots in each component of our interactive data 
 
 #### Data Cleaning
 The first step of processing data downloaded from the website is formatting it for data analysis. We refer to this process as 'cleaning' data. The format of the raw sensor data changed after PurpleAir deprecated its API. So, we use two different data cleaning processes, one for the old data (data from before March 30, 2021) and one for the new data (all data from after March 30,2021).
-<<<<<<< HEAD
+
 
 The function that cleans the old data assumes that the comma-separated values (csv) file has two PM2.5 reading channels, as well as timestamp, humidity, latitude, and longitude columns. We correct the timestamp (so that it is adjusted to the America/Los Angeles time zone) and get rid of any values that exceed the standard EPA thresholds. Then, we use a correction factor to adjust the data so that it meets EPA standards.
 
 The function that cleans the new data assumes the CSV file has a single PM2.5 column, as well as columns for timestamp, sensor names, latitude, longitude, humidity, and mean percent difference. To clean the new data, we adjust the timestamp to the America/Los Angeles time zone, and make sure to remove any negative PM2.5 readings in the data.
 
-=======
 
 The function that cleans the old data assumes that the comma-separated values (csv) file has two PM2.5 reading channels, as well as timestamp, humidity, latitude, and longitude columns. We correct the timestamp (so that it is adjusted to the America/Los Angeles time zone) and get rid of any values that exceed the standard EPA thresholds. Then, we use a correction factor to adjust the data so that it meets EPA standards.
 
 The function that cleans the new data assumes the CSV file has a single PM2.5 column, as well as columns for timestamp, sensor names, latitude, longitude, humidity, and mean percent difference. To clean the new data, we adjust the timestamp to the America/Los Angeles time zone, and make sure to remove any negative PM2.5 readings in the data.
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
+
 The PurpleAir sensors used in generating this report are listed below:
 ```{r sensors, echo=FALSE}
 cat(selectedSensors, sep = "\n")
@@ -114,19 +109,15 @@ cat(selectedSensors, sep = "\n")
 
 ## Summary Statistics 
 
-<<<<<<< HEAD
 
 For the summary statistics calculations, we refer to the general hourly PM2.5 for South Gate PurpleAir sensors. The general hourly readings are the aggregated PM2.5 values by hour, which is an average of each sensor's hourly PM2.5 readings.
-=======
+
 
 For the summary statistics calculations, we refer to the general hourly PM2.5 for South Gate PurpleAir sensors. The general hourly readings are the aggregated PM2.5 values by hour, which is an average of each sensor's hourly PM2.5 readings.
 
 ```{r past3, echo=FALSE}
 
-Average <- mean(avgSG$average_PM2.5)
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 
-```{r past3, echo=FALSE}
 Average <- mean(avgSG$average_PM2.5)
 historical <- ggplot(avgSG[avgSG$timestamp <= as_datetime(params$d2) & avgSG$timestamp >= as_datetime(params$d2)-lubridate::days(3),], aes(x=as_datetime(timestamp),y=average_PM2.5, group=category))+
     geom_hline(aes(yintercept = Average), color="blue", linetype="dashed")+
@@ -191,15 +182,11 @@ print(hilo)
 # 
 # 
 # print(epahist)
-<<<<<<< HEAD
-=======
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 ```
 
 
 The following two graphs display 8 hour averages for two distinct, specified time periods.
-<<<<<<< HEAD
 
 ```{r avgs, echo=FALSE, fig.show="hold", out.width="50%"}
 par(mar = c(4, 4, .1, .1))
@@ -213,19 +200,17 @@ paste(paste(Title1,"(left)", sep=" "), paste(Title2,"(right)", sep=" "), sep=" "
 plot(avgs1,type="l", xlab = "Time", ylab = "PM2.5 (micrograms/m3)")
 plot(avgs2,type="l", xlab = "Time", ylab = "PM2.5 (micrograms/m3)")
 ```
-=======
+
 
 ```{r avgs, echo=FALSE, fig.show="hold", out.width="50%"}
 par(mar = c(4, 4, .1, .1))
 
 Title1 <- paste("8 Hour Averages From", paste(as.character(dates1), collapse = " to "))
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
+
 
 avgs1 <- zoo::rollmean(avgSG$average_PM2.5[lubridate::date(avgSG$timestamp) >= toString(dates1[1]) & lubridate::date(avgSG$timestamp) <= toString(dates1[2])], k=8)
 
-<<<<<<< HEAD
-=======
-        
+
         
 Title2 <- paste("8 Hour Averages From", paste(as.character(dates2), collapse = " to "))
 
@@ -237,7 +222,7 @@ plot(avgs1,type="l", xlab = "Time", ylab = "PM2.5 (micrograms/m3)")
 plot(avgs2,type="l", xlab = "Time", ylab = "PM2.5 (micrograms/m3)")
 
 ```
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
+
 
 
 The following three graphs display the diurnal patterns for average, peak, the range of PM2.5 values over a 24-hour period.
@@ -300,11 +285,9 @@ grid()
 
 
 This chart displays the density of peak PM2.5 values over a specified 24-hour period.
-```{r density, echo=FALSE}
-<<<<<<< HEAD
-=======
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
+```{r density, echo=FALSE}
+
 suppressWarnings({   
 dens <- ggplot(PAhi_lo[PAhi_lo$type == "high" & lubridate::date(PAhi_lo$timestamp) >= toString(dates3[1]) & lubridate::date(PAhi_lo$timestamp) <= toString(dates3[2]),], aes(x=hour, group = timeofday))+
   geom_histogram(aes(y=after_stat(count/nrow(PAhi_lo[PAhi_lo$type == "high",])), color=timeofday, fill=timeofday), alpha=0.7, stat="count", bins=4, lwd=1)+
@@ -316,10 +299,7 @@ dens <- ggplot(PAhi_lo[PAhi_lo$type == "high" & lubridate::date(PAhi_lo$timestam
   theme_minimal()
 print(dens)
 })
-<<<<<<< HEAD
-=======
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 ```
 
 ## Sensor Summaries
@@ -331,16 +311,10 @@ The Sensor Summaries plots allow users to inspect the consistency of each sensor
 #### Network-Based Observations
 
 The plots below provide a holistic inspection of the sensor network, showing where sensors report higher (or lower) values, which sensors typically report outliers, and finally, how often each of the sensors go down.
-<<<<<<< HEAD
-=======
-
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 
 
-<<<<<<< HEAD
 ```{r catsSensors, echo=FALSE}
-=======
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
+
 suppressWarnings({
 plot <- ggplot(PAhourly, aes(x=names, group=category)) +
             geom_histogram(aes(y=after_stat(count), fill=category), position = position_stack(reverse = TRUE), stat="count", lwd=0.5, col="black")+
@@ -356,10 +330,7 @@ print(plot)
 
 
 ```{r downDays, echo=FALSE}
-<<<<<<< HEAD
-=======
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 down <- ggplot(downSensors, aes(y=numDownDays))+
     geom_col(aes(x= names, y=numDownDays), lwd=1)+
     labs(x = "Sensors", y = "Number of Days") +
@@ -375,19 +346,7 @@ print(down)
 
 
 The following charts and spatial plots illustrate which sensors typically report higher or lower values. They report on the number of readings over/under the median that each sensor records, and the magnitude of this over/under in terms of percent difference. The median here is calculated at each hour for all the sensors in the network, and the readings are all taken to exclusively be over/under the median. The count of readings over the median for each sensor are further striated into categories of incremental percent difference that inform about how much greater, or lesser, than the median the observed readings are. This chart is useful for both identifying which sensors are typically reporting higher values, and of course, which sensors are consistently reporting outliers.
-<<<<<<< HEAD
-=======
 
-
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
-
-
-<<<<<<< HEAD
-=======
-
-suppressWarnings({
-pct_diffCols <- c("0-15%"="#FEEDDE", "15%-50%"="#FDBE85","50%-100%" = "#FD8D3C", "200% or more"="#E6550D","total readings"="#80808050")
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 
 ```{r overMedian, echo=FALSE}
 suppressWarnings({
@@ -406,19 +365,13 @@ plot <- ggplot(readings_overCT, aes(x=names)) +
     theme(axis.text.x = element_text(angle = 75, hjust=1))
 print(plot)
 })
-<<<<<<< HEAD
-=======
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 ```
 
 
 
 ```{r overMap, echo=FALSE}
-<<<<<<< HEAD
-=======
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 suppressWarnings({
 k <- ggplot(readings_overCT, aes(longitude, latitude)) +
             geom_path(data = sg.city, aes(long, lat, group=id), color='black')+
@@ -437,10 +390,7 @@ print(k)
 
 
 ```{r underMedian, echo=FALSE}
-<<<<<<< HEAD
-=======
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 suppressWarnings({
 pct_diffCols <- c("0-15%"="#EDF8FB", "15%-50%"="#B3CDE3","50%-100%" = "#8C96C6", "200% or more"="#88419D","total readings"="#80808050")
 plot <- ggplot(readings_underCT, aes(x=names)) +
@@ -486,14 +436,9 @@ print(k)
 #### Single-sensor Observations
 
 Here we have plots and observations for an individual sensor. There are visualizations for high and low values, EPA categories by percentage, and mean percent difference data (for data downloaded after March, 30, 2021).
-<<<<<<< HEAD
-
-```{r catsbysensor, echo=FALSE}
-=======
 
 ```{r catsbysensor, echo=FALSE}
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 suppressWarnings({
 print(ggplot(PAhourly[PAhourly$names == sensor,], aes(x=category, group=category)) +
           geom_histogram(aes(y=after_stat(count/nrow(PAhourly[PAhourly$names == sensor,])), fill=category), stat="count", lwd=0.5, col="black")+
@@ -503,25 +448,22 @@ print(ggplot(PAhourly[PAhourly$names == sensor,], aes(x=category, group=category
           scale_fill_discrete(type=EPAcols)+
           theme(axis.text.x = element_text(angle = 75, hjust=1)))
 })
-<<<<<<< HEAD
-=======
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 ```
 
 
 ```{r pctDiff, echo=FALSE}
-<<<<<<< HEAD
-   title <- paste("Mean Percent Difference for", sensor, sep=" ")
-   
-   plot(x=PAfull$timestamp[PAfull$names==sensor], y=PAfull$percent.diff[PAfull$names==sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")
-=======
 
    title <- paste("Mean Percent Difference for", sensor, sep=" ")
    
    plot(x=PAfull$timestamp[PAfull$names==sensor], y=PAfull$percent.diff[PAfull$names==sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
+
+   title <- paste("Mean Percent Difference for", sensor, sep=" ")
+   
+   plot(x=PAfull$timestamp[PAfull$names==sensor], y=PAfull$percent.diff[PAfull$names==sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")
+
+
 ```
 
 
@@ -538,11 +480,7 @@ hilo <- ggplot(data=PAhi_lo[PAhi_lo$names == sensor,], aes(x=date, y=PM2.5, grou
         ggtitle(sensor) +
         theme_minimal()
 print(hilo)
-<<<<<<< HEAD
-=======
 
-
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
 ```
 
 
@@ -588,15 +526,11 @@ autoStDev <- ggplot() + geom_tile(autoDF, mapping = aes(x,y,fill=`standard devia
     theme_bw() +
     ggtitle("Ordinary Kriging PM2.5 Standard Deviation")
 print(autoStDev)
-<<<<<<< HEAD
-```
-
-
-=======
 
 ```
 
 
 
 
->>>>>>> 41945b353489db1acc7df2c24c19c58f68bd499a
+
+
