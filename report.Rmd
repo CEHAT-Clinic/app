@@ -48,8 +48,10 @@ dates1 <- c(params$dts1)
 dates2 <- c(params$dts2)
 dates3 <- params$dts3
 dates4 <- params$dts4
+answer <- params$answer
 
 matchingDays <- params$matching
+
 
 PAfull <- params$PAfull
 PAhourly <- params$PAhourly
@@ -469,10 +471,12 @@ print(ggplot(PAhourly[PAhourly$names == sensor,], aes(x=category, group=category
 
 
 ```{r pctDiff, echo=FALSE}
-
+if (answer == "Y"){
    title <- paste("Mean Percent Difference for", sensor, sep=" ")
-   
-   plot(x=PAfull$timestamp[PAfull$names==sensor], y=PAfull$percent.diff[PAfull$names==sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")
+   plot(x=PAfull$timestamp[PAfull$names==sensor], y=PAfull$percent.diff[PAfull$names==sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")}
+if(answer = "N"){ 
+      df <- as.data.frame(x=c(),percent.diff=c())
+      plot(df$x,df$percent.diff, xlim = c(0,10),ylim =c(0,100))}
 
 ```
 
