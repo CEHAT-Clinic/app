@@ -474,7 +474,7 @@ print(ggplot(PAhourly[PAhourly$names == sensor,], aes(x=category, group=category
 if (answer == "Y"){
    title <- paste("Mean Percent Difference for", sensor, sep=" ")
    plot(x=PAfull$timestamp[PAfull$names==sensor], y=PAfull$percent.diff[PAfull$names==sensor], xlab = "Time", ylab = "Percent Difference", main = title, ylim = c(0,100), type="l")}
-if(answer = "N"){ 
+if(answer == "N"){ 
       df <- as.data.frame(x=c(),percent.diff=c())
       plot(df$x,df$percent.diff, xlim = c(0,10),ylim =c(0,100))}
 
